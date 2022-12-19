@@ -126,7 +126,7 @@
         </Property>
         <Property name="horizontalAlignment" type="int" value="0"/>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/oopfinal/Ekran g&#xf6;r&#xfc;nt&#xfc;s&#xfc; 2022-12-14 224647.png"/>
+          <Image iconType="3" name="/oopfinal/bank_logo.png"/>
         </Property>
       </Properties>
     </Component>

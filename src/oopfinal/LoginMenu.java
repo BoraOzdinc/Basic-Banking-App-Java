@@ -135,7 +135,7 @@ public class LoginMenu extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Anke", 0, 24)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/Ekran görüntüsü 2022-12-14 224647.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/bank_logo.png"))); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("Anke", 0, 18)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
