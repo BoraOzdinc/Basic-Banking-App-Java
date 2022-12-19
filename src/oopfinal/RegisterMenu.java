@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package oopfinal;
 
 import java.io.EOFException;
@@ -22,60 +19,66 @@ public class RegisterMenu extends javax.swing.JFrame {
     
     ArrayList<BankDetails> bankDetailsList;
     
+    public RegisterMenu() {
+    // Initialize the bankDetailsList as an ArrayList of BankDetails objects
+    bankDetailsList = new ArrayList<BankDetails>();
+    
+    // Initialize the GUI components
+    initComponents();
+    
+    // Populate the bankDetailsList with data from the BankDetails.dat file
+    populateBankDetailsList();
+}
+
+    
+    public void populateBankDetailsList(){
+    try{
+        // Create a FileInputStream to read from the BankDetails.dat file
+        FileInputStream file = new FileInputStream("BankDetails.dat");
+        // Create an ObjectInputStream using the FileInputStream
+        ObjectInputStream inputFile = new ObjectInputStream(file);
+        
+        // Flag to indicate whether the end of the file has been reached
+        boolean endOfFile = false;
+        // Loop until the end of the file is reached
+        while (!endOfFile){
+            try{
+                // Read an object from the ObjectInputStream and add it to the bankDetailsList
+                bankDetailsList.add((BankDetails) inputFile.readObject());
+            } catch(EOFException e){
+                // If an EOFException is thrown, set the endOfFile flag to true to exit the loop
+                endOfFile = true;
+            } catch(Exception f){
+                // Catch any other exceptions and ignore them
+            }
+        }
+        // Close the ObjectInputStream
+        inputFile.close();
+    } catch(IOException e){
+        // Catch any IOExceptions and ignore them
+    }
+}
 
     
     
-    
-    public RegisterMenu() {
-        bankDetailsList = new ArrayList<BankDetails>();
-        initComponents();
-        populateBankDetailsList();
-        
-        
-        
-    }
-    
-    public void populateBankDetailsList(){
-        try{
-            FileInputStream file = new FileInputStream("BankDetails.dat");
-            ObjectInputStream inputFile = new ObjectInputStream(file);
-            
-            boolean endOfFile = false;
-            while (!endOfFile){
-                try{
-                    bankDetailsList.add((BankDetails) inputFile.readObject());
-                }catch(EOFException e){
-                    endOfFile = true;
-                }catch(Exception f){
-                                     
-                }
-            }
-            inputFile.close();
-        }catch(IOException e){
-            
-        }
-    }
-    
-    
     public void saveBankDetailsToFile(){
-        try{
-            FileOutputStream file2 = new FileOutputStream("BankDetails.dat");
-            ObjectOutputStream outputFile2 = new ObjectOutputStream(file2);
-            
-            for (int i = 0; i < bankDetailsList.size(); i++) {
-                
-                outputFile2.writeObject(bankDetailsList.get(i));
-               
-            }
-            outputFile2.close();
-            
-            
-           
-            
-        }catch(IOException e){
-            
+    try{
+        // Create a FileOutputStream to write to the BankDetails.dat file
+        FileOutputStream file2 = new FileOutputStream("BankDetails.dat");
+        // Create an ObjectOutputStream using the FileOutputStream
+        ObjectOutputStream outputFile2 = new ObjectOutputStream(file2);
+        
+        // Loop through the bankDetailsList and write each object to the ObjectOutputStream
+        for (int i = 0; i < bankDetailsList.size(); i++) {
+            outputFile2.writeObject(bankDetailsList.get(i));
         }
+        // Close the ObjectOutputStream
+        outputFile2.close();
+    } catch(IOException e){
+        // Catch any IOExceptions and ignore them
     }
+}
+
     
     private static String rndAccNo() {
     // It will generate 6 digit random Number.
@@ -203,35 +206,51 @@ public class RegisterMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
-        LoginMenu l = new LoginMenu();
-        if (this.registerName.getText().isEmpty() || 
-                this.registerPassword.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "You Have To Fill All The Details!");
-        }
-        else if(!l.isFourDigit(this.registerPassword.getText())){
-            JOptionPane.showMessageDialog(null, "Password must be 4 digit long and cannot Contain any special characters!");
-        }
-        else if(!containsOnlyLetters(this.registerName.getText())){
-            JOptionPane.showMessageDialog(null, "Your name must contain only aphabetical letters and cannot contain any special characters!");
-        }
-        else if(!containsOnlyNumbers(this.registerAge.getText())){
-            JOptionPane.showMessageDialog(null, "Your Age must contain only integers!");
-        }
-        else{
-            String registerName = this.registerName.getText().trim();
-            String registerPassword = this.registerPassword.getText().trim();
-            int registerAge = Integer.parseInt(this.registerAge.getText().trim());
-            
-            String tempAccNo = rndAccNo();
+        // Create a LoginMenu object to access the isFourDigit function
+    LoginMenu l = new LoginMenu();
 
-            BankDetails bankDetails = new BankDetails(tempAccNo, registerPassword, 0, registerName, registerAge);
-            bankDetailsList.add(bankDetails);
-            saveBankDetailsToFile();
-            JOptionPane.showMessageDialog(null, "Succesfully Registered!\nHello " + registerName +" Your Account Number is " + tempAccNo + "\nPlease Remember Your Account Number!");
-            System.out.println("bank details list: " + bankDetailsList.size() + "\nAdded User : " + registerName + "\npass: " + registerPassword + "\nage: " + registerAge +
-                    "\naccno: " + tempAccNo);
+    // Get the name, password, and age from the text fields
+    String name = this.registerName.getText().trim();
+    String password = this.registerPassword.getText().trim();
+    String ageStr = this.registerAge.getText().trim();
+
+    // Check if any of the fields are empty
+    if (name.isEmpty() || password.isEmpty() || ageStr.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "You have to fill all the details!");
+        return;
+    }
+
+    // Check if the password is 4 digits long and contains only digits
+    if (!l.isFourDigit(password)) {
+        JOptionPane.showMessageDialog(null, "Password must be 4 digits long and cannot contain any special characters!");
+        return;
+    }
+
+    // Check if the name contains only letters
+    if (!containsOnlyLetters(name)) {
+        JOptionPane.showMessageDialog(null, "Your name must contain only alphabetical letters and cannot contain any special characters!");
+        return;
+    }
+
+    // Check if the age contains only digits
+    if (!containsOnlyNumbers(ageStr)) {
+        JOptionPane.showMessageDialog(null, "Your age must contain only integers!");
+        return;
+    }
+
+    // If all the checks pass, create a BankDetails object with the entered data and add it to the bankDetailsList
+    int age = Integer.parseInt(ageStr);
+    String accNo = rndAccNo();
+    BankDetails bankDetails = new BankDetails(accNo, password, 0, name, age);
+    bankDetailsList.add(bankDetails);
+
+    // Save the bankDetailsList to the BankDetails.dat file
+    saveBankDetailsToFile();
+
+    // Show a success message with the account number
+    JOptionPane.showMessageDialog(null, "Successfully Registered!\nHello " + name + " Your Account Number is " + accNo + "\nPlease remember your account number!");
     }//GEN-LAST:event_registerButtonActionPerformed
-    }        
+            
     
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

@@ -1,15 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package oopfinal;
 
-import java.io.EOFException;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import javax.swing.JOptionPane;
 
 /**
@@ -25,9 +15,7 @@ public class LoginMenu extends javax.swing.JFrame {
     public LoginMenu() {
         RegisterMenu r = new RegisterMenu();
         initComponents();
-        r.populateBankDetailsList();
-               
-        
+        r.populateBankDetailsList();       
     }
     
     
@@ -198,63 +186,71 @@ public class LoginMenu extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    
+    // This function is called when the "login" button is clicked. It gets the account number and password from the text fields,
+    // and checks if they are valid. If they are valid, it searches the bankDetailsList for a BankDetails object with a matching
+    // account number. If a matching object is found, it checks if the password matches. If both the account number and password
+    // are correct, it displays a success message and opens the MainBankMenu window. If either the account number or password is
+    // incorrect, it displays an error message.
+
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
-        RegisterMenu r = new RegisterMenu();
-        if (this.accountNoLogin.getText().isEmpty() || 
-                this.passwordLogin.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "You Have To Fill All The Details!");
-        }
-        else if (!isSixDigit(this.accountNoLogin.getText())){
-            JOptionPane.showMessageDialog(null, "Account No must be 6 digit long and Cannot contain any special characters!");
-        }
-        else if(!isFourDigit(this.passwordLogin.getText())){
-            JOptionPane.showMessageDialog(null, "Password must be 4 digit long and cannot Contain any special characters!");
-        }
-        else{
-            
-            
-            String accNoInput = this.accountNoLogin.getText().trim();
-            int userIndex = -1;
-            for (int i = 0; i < r.bankDetailsList.size(); i++) {
-                BankDetails userDetails = r.bankDetailsList.get(i);
-                if(Integer.parseInt(userDetails.getAccNo()) == Integer.parseInt(accNoInput)){
-                    userIndex = i;
-                    System.out.println("userindex: "+userIndex+"\naccno: "+userDetails.getAccNo()+"\nname: " + userDetails.getName() + "\npass: " + userDetails.getPassword() +
-                            "\nage: " + userDetails.getAge());
-                    break;
-                }
-                
+        // Create a new RegisterMenu object
+    RegisterMenu r = new RegisterMenu();
+    
+    // Check if the account number and password fields are empty
+    if (this.accountNoLogin.getText().isEmpty() || this.passwordLogin.getText().isEmpty()) {
+        // Display error message if either field is empty
+        JOptionPane.showMessageDialog(null, "You Have To Fill All The Details!");
+    }
+    else if (!isSixDigit(this.accountNoLogin.getText())){
+        // Display error message if the account number is not a 6-digit string
+        JOptionPane.showMessageDialog(null, "Account No must be 6 digit long and Cannot contain any special characters!");
+    }
+    else if(!isFourDigit(this.passwordLogin.getText())){
+        // Display error message if the password is not a 4-digit string
+        JOptionPane.showMessageDialog(null, "Password must be 4 digit long and cannot Contain any special characters!");
+    }
+    else {
+        // If both the account number and password are in the correct format, search for a matching account number in the bankDetailsList
+        String accNoInput = this.accountNoLogin.getText().trim();
+        int userIndex = -1;
+        for (int i = 0; i < r.bankDetailsList.size(); i++) {
+            BankDetails userDetails = r.bankDetailsList.get(i);
+            // If a matching account number is found, store the index and retrieve the BankDetails object
+            if(Integer.parseInt(userDetails.getAccNo()) == Integer.parseInt(accNoInput)){
+                userIndex = i;
+                System.out.println("userindex: "+userIndex+"\naccno: "+userDetails.getAccNo()+"\nname: " + userDetails.getName() + "\npass: " + userDetails.getPassword() +
+                        "\nage: " + userDetails.getAge());
+                break;
             }
-            
-            if(userIndex == -1){
+        }
+        
+        // If the account number is not found, display an error message
+        if(userIndex == -1){
+            JOptionPane.showMessageDialog(null, "Your Account Number or Password is invalid!");
+        }
+        else {
+            // If the account number is found, retrieve the BankDetails object and check if the password matches
+            BankDetails userDetails = r.bankDetailsList.get(userIndex);
+            if(!userDetails.getPassword().equals(this.passwordLogin.getText().trim())){
+                // Display error message if the password is incorrect
                 JOptionPane.showMessageDialog(null, "Your Account Number or Password is invalid!");
             }
-            else{
-                BankDetails userDetails = r.bankDetailsList.get(userIndex);
-                if(!userDetails.getPassword().equals(this.passwordLogin.getText().trim())){
-                    JOptionPane.showMessageDialog(null, "Your Account Number or Password is invalid!");
-                }
-                else{
-                    JOptionPane.showMessageDialog(null, "Successfully logged in!\nHello " + userDetails.getName());
-                    new MainBankMenu().setVisible(true);
-                    dispose();
-                    
-                }
-                
+            else {
+                // If the password is correct, display a success message and show the MainBankMenu form
+                JOptionPane.showMessageDialog(null, "Successfully logged in!\nHello " + userDetails.getName());
+                new MainBankMenu().setVisible(true);
+                dispose();
             }
         }
+    }
     }//GEN-LAST:event_loginButtonActionPerformed
 
     private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
         new RegisterMenu().setVisible(true);
         dispose();
     }//GEN-LAST:event_registerButtonActionPerformed
-    
-   
-    
-    /**
-     * @param args the command line arguments
-     */
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
