@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 public class LoginMenu extends javax.swing.JFrame {
     
     
-    
+    public String userAccNo;
     
     
     public LoginMenu() {
@@ -239,6 +239,7 @@ public class LoginMenu extends javax.swing.JFrame {
             else {
                 // If the password is correct, display a success message and show the MainBankMenu form
                 JOptionPane.showMessageDialog(null, "Successfully logged in!\nHello " + userDetails.getName());
+                userAccNo = userDetails.getAccNo();
                 new MainBankMenu().setVisible(true);
                 dispose();
             }
