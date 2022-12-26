@@ -1,12 +1,15 @@
 package oopfinal;
 
+
 import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -15,34 +18,90 @@ import java.util.ArrayList;
 public class MainBankMenu extends javax.swing.JFrame {
     RegisterMenu r = new RegisterMenu();
     LoginMenu l = new LoginMenu();
-    public String userAccNo = "999999"; //l.userAccNo;
+    
+    public static int userIndex;
+    BankDetails bankDetails = r.bankDetailsList.get(userIndex);
+    
     ArrayList<Transactions> transactions;
     
     ArrayList<Accounts> accounts;
     
-    public MainBankMenu() {
+    public MainBankMenu() {     
         
-        
-        transactions = new ArrayList<Transactions>();
         accounts = new ArrayList<Accounts>();
-        initComponents();
-        accountDashboard();
         
+        initComponents();
+        r.populateBankDetailsList();
+        populateAccounts();
+        System.out.println(accounts);
+        accountDashboard();        
     }
     
-    public void accountDashboard(){
-        Accounts newAccount = new Accounts(userAccNo, 1, 5000,"Savings Account");
-        Accounts newAccount2 = new Accounts(userAccNo, 2, 8000,"Main Account");
-        Accounts newAccount3 = new Accounts(userAccNo, 3, 500,"Bills");
-        Accounts newAccount4 = new Accounts(userAccNo, 4, 50000,"Salary");
-        accounts.add(newAccount);
-        accounts.add(newAccount2);
-        accounts.add(newAccount3);
-        accounts.add(newAccount4);
+    public void saveAccountsFile(){
+    try{
+        // Create a FileOutputStream to write to the BankDetails.dat file
+        FileOutputStream file2 = new FileOutputStream("Accounts.dat");
+        // Create an ObjectOutputStream using the FileOutputStream
+        ObjectOutputStream outputFile2 = new ObjectOutputStream(file2);
         
+        // Loop through the bankDetailsList and write each object to the ObjectOutputStream
+        for (int i = 0; i < accounts.size(); i++) {
+            outputFile2.writeObject(accounts.get(i));
+        }
+        // Close the ObjectOutputStream
+        outputFile2.close();
+    } catch(IOException e){
+        // Catch any IOExceptions and ignore them
+    }
+}
+
+  public void populateAccounts(){
+    try{
+        // Create a FileInputStream to read from the BankDetails.dat file
+        FileInputStream file = new FileInputStream("Accounts.dat");
+        // Create an ObjectInputStream using the FileInputStream
+        ObjectInputStream inputFile = new ObjectInputStream(file);
+        
+        // Flag to indicate whether the end of the file has been reached
+        boolean endOfFile = false;
+        // Loop until the end of the file is reached
+        while (!endOfFile){
+            try{
+                // Read an object from the ObjectInputStream and add it to the bankDetailsList
+                accounts.add((Accounts) inputFile.readObject());
+            } catch(EOFException e){
+                // If an EOFException is thrown, set the endOfFile flag to true to exit the loop
+                endOfFile = true;
+            } catch(Exception f){
+                JOptionPane.showMessageDialog(null,f);
+            }
+        }
+        // Close the ObjectInputStream
+        inputFile.close();
+    } catch(IOException e){
+        JOptionPane.showMessageDialog(null,e);
+    }
+}
+    public void accountDashboard(){
+        String userAccNo = bankDetails.getAccNo();
+
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+        
+        welcomeLabel.setText(bankDetails.getName());
+        double d = bankDetails.getBalance();
+        DecimalFormat df = new DecimalFormat("#.00");
+        String s = df.format(d);
+        if(bankDetails.getBalance() == 0.0){
+            totalBalance.setText("$ 0.00");
+        }
+        else{
+            totalBalance.setText("$ "+s);
+        }
+        
         if(userAccounts.size() == 0){
             dashboardAccounts.setVisible(false);
+            dashboardAccounts1.setVisible(false);
+            
         }
         else if(userAccounts.size() == 1){
             dashboardAccounts.setVisible(true);
@@ -55,8 +114,23 @@ public class MainBankMenu extends javax.swing.JFrame {
             accNo4.setVisible(false);
             accNo4Balance.setVisible(false);
             accNo4Label.setVisible(false);
+            
+            accNo6Balance.setVisible(false);
+            accNo6.setVisible(false);
+            accNo6Label.setVisible(false);
+            
+            accNo7Balance.setVisible(false);
+            accNo7.setVisible(false);
+            accNo7Label.setVisible(false);
+            
+            accNo8.setVisible(false);
+            accNo8Label.setVisible(false);
+            accNo8Balance.setVisible(false);
+            
             accNo1Label.setText(userAccounts.get(0).getAccountName());
             accNo1Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+            accNo5Label.setText(userAccounts.get(0).getAccountName());
+            accNo5Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
         }
         else if(userAccounts.size() == 2){
             dashboardAccounts.setVisible(true);           
@@ -66,25 +140,47 @@ public class MainBankMenu extends javax.swing.JFrame {
             accNo4.setVisible(false);
             accNo4Balance.setVisible(false);
             accNo4Label.setVisible(false);
+            accNo7Balance.setVisible(false);
+            accNo7.setVisible(false);
+            accNo7Label.setVisible(false);
+            
+            accNo8.setVisible(false);
+            accNo8Label.setVisible(false);
+            accNo8Balance.setVisible(false);
             accNo1Label.setText(userAccounts.get(0).getAccountName());
             accNo1Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
             accNo2Label.setText(userAccounts.get(1).getAccountName());
             accNo2Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+            accNo5Label.setText(userAccounts.get(0).getAccountName());
+            accNo5Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+            accNo6Label.setText(userAccounts.get(1).getAccountName());
+            accNo6Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
         }
         else if(userAccounts.size() == 3){
             dashboardAccounts.setVisible(true);           
             accNo4.setVisible(false);
             accNo4Balance.setVisible(false);
             accNo4Label.setVisible(false);
+            accNo8.setVisible(false);
+            accNo8Label.setVisible(false);
+            accNo8Balance.setVisible(false);
             accNo1Label.setText(userAccounts.get(0).getAccountName());
             accNo1Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
             accNo2Label.setText(userAccounts.get(1).getAccountName());
             accNo2Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
             accNo3Label.setText(userAccounts.get(2).getAccountName());
             accNo3Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+            accNo5Label.setText(userAccounts.get(0).getAccountName());
+            accNo5Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+            accNo6Label.setText(userAccounts.get(1).getAccountName());
+            accNo6Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+            accNo7Label.setText(userAccounts.get(2).getAccountName());
+            accNo7Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+            
         }
         else if(userAccounts.size() == 4){
-            dashboardAccounts.setVisible(true);           
+            dashboardAccounts.setVisible(true);
+            dashboardAccounts1.setVisible(true);
             accNo1Label.setText(userAccounts.get(0).getAccountName());
             accNo1Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
             accNo2Label.setText(userAccounts.get(1).getAccountName());
@@ -93,6 +189,14 @@ public class MainBankMenu extends javax.swing.JFrame {
             accNo3Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
             accNo4Label.setText(userAccounts.get(3).getAccountName());
             accNo4Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(3).getBalanceOfAccount()));
+            accNo5Label.setText(userAccounts.get(0).getAccountName());
+            accNo5Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+            accNo6Label.setText(userAccounts.get(1).getAccountName());
+            accNo6Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+            accNo7Label.setText(userAccounts.get(2).getAccountName());
+            accNo7Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+            accNo8Label.setText(userAccounts.get(3).getAccountName());
+            accNo8Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(3).getBalanceOfAccount()));
         }
     }
     
@@ -107,66 +211,13 @@ public class MainBankMenu extends javax.swing.JFrame {
     return matchingAccounts;
   }
     
-    
-    
-    public void populateTransactionHistory(){
-    try{
-        // Create a FileInputStream to read from the TransactionHistory.dat file
-        FileInputStream file = new FileInputStream("TransactionHistory.dat");
-        // Create an ObjectInputStream using the FileInputStream
-        ObjectInputStream inputFile = new ObjectInputStream(file);
-        
-        // Flag to indicate whether the end of the file has been reached
-        boolean endOfFile = false;
-        // Loop until the end of the file is reached
-        while (!endOfFile){
-            try{
-                // Read an object from the ObjectInputStream and add it to the transactions
-                transactions.add((Transactions) inputFile.readObject());
-            } catch(EOFException e){
-                // If an EOFException is thrown, set the endOfFile flag to true to exit the loop
-                endOfFile = true;
-            } catch(Exception f){
-                // Catch any other exceptions and ignore them
-            }
-        }
-        // Close the ObjectInputStream
-        inputFile.close();
-    } catch(IOException e){
-        // Catch any IOExceptions and ignore them
-    }
-}
-
-    
-    
-    public void saveTransactionHistoryToFile(){
-    try{
-        // Create a FileOutputStream to write to the TransactionHistory.dat file
-        FileOutputStream file2 = new FileOutputStream("TransactionHistory.dat");
-        // Create an ObjectOutputStream using the FileOutputStream
-        ObjectOutputStream outputFile2 = new ObjectOutputStream(file2);
-        
-        // Loop through the transactions and write each object to the ObjectOutputStream
-        for (int i = 0; i < transactions.size(); i++) {
-            outputFile2.writeObject(transactions.get(i));
-        }
-        // Close the ObjectOutputStream
-        outputFile2.close();
-    } catch(IOException e){
-        // Catch any IOExceptions and ignore them
-    }
-}
-    
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         TabMenu = new javax.swing.JPanel();
+        welcomeLabel = new javax.swing.JLabel();
+        welcomeLabel1 = new javax.swing.JLabel();
         dashboardTab = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         accountsTab = new javax.swing.JPanel();
@@ -182,7 +233,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         Menus = new javax.swing.JPanel();
         dashboardMenu = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
+        totalBalance = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         dashboardAccounts = new javax.swing.JPanel();
@@ -198,14 +249,47 @@ public class MainBankMenu extends javax.swing.JFrame {
         accNo2Balance = new javax.swing.JLabel();
         accNo3Balance = new javax.swing.JLabel();
         accNo4Balance = new javax.swing.JLabel();
+        accountsMenu = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        dashboardAccounts1 = new javax.swing.JPanel();
+        accNo7 = new javax.swing.JLabel();
+        accNo5 = new javax.swing.JLabel();
+        accNo6 = new javax.swing.JLabel();
+        accNo8 = new javax.swing.JLabel();
+        accNo5Label = new javax.swing.JLabel();
+        accNo6Label = new javax.swing.JLabel();
+        accNo7Label = new javax.swing.JLabel();
+        accNo8Label = new javax.swing.JLabel();
+        accNo5Balance = new javax.swing.JLabel();
+        accNo6Balance = new javax.swing.JLabel();
+        accNo7Balance = new javax.swing.JLabel();
+        accNo8Balance = new javax.swing.JLabel();
+        createAccountButtonPanel = new javax.swing.JPanel();
+        jLabel11 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMaximumSize(new java.awt.Dimension(1200, 695));
+        setMinimumSize(new java.awt.Dimension(1200, 695));
+        setResizable(false);
 
         TabMenu.setBackground(new java.awt.Color(255, 255, 255));
 
-        dashboardTab.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        welcomeLabel.setFont(new java.awt.Font("Poppins", 1, 18)); // NOI18N
+        welcomeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        welcomeLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        welcomeLabel1.setFont(new java.awt.Font("Poppins", 1, 24)); // NOI18N
+        welcomeLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        welcomeLabel1.setText("Welcome");
+
+        dashboardTab.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        dashboardTab.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                dashboardTabMouseClicked(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Dashboard");
         jLabel1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -228,8 +312,13 @@ public class MainBankMenu extends javax.swing.JFrame {
         );
 
         accountsTab.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        accountsTab.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                accountsTabMouseClicked(evt);
+            }
+        });
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Accounts");
         jLabel2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -253,7 +342,7 @@ public class MainBankMenu extends javax.swing.JFrame {
 
         transactionsTab.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("Transactions");
         jLabel3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -277,7 +366,7 @@ public class MainBankMenu extends javax.swing.JFrame {
 
         paymentsTab.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("Payments");
         jLabel4.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -306,7 +395,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             }
         });
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("Settings");
         jLabel5.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -329,8 +418,13 @@ public class MainBankMenu extends javax.swing.JFrame {
         );
 
         logoutButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        logoutButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                logoutButtonMouseClicked(evt);
+            }
+        });
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel6.setText("Log out");
         jLabel6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -362,15 +456,21 @@ public class MainBankMenu extends javax.swing.JFrame {
             .addComponent(paymentsTab, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, TabMenuLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(TabMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(logoutButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(settingsTab, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(TabMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(welcomeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(welcomeLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(logoutButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(settingsTab, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         TabMenuLayout.setVerticalGroup(
             TabMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(TabMenuLayout.createSequentialGroup()
-                .addContainerGap(219, Short.MAX_VALUE)
+                .addGap(42, 42, 42)
+                .addComponent(welcomeLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(welcomeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
                 .addComponent(dashboardTab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(accountsTab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -378,74 +478,91 @@ public class MainBankMenu extends javax.swing.JFrame {
                 .addComponent(transactionsTab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(paymentsTab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(170, 170, 170)
+                .addGap(107, 107, 107)
                 .addComponent(settingsTab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(logoutButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(69, 69, 69))
         );
 
         Menus.setBackground(new java.awt.Color(232, 232, 232));
+        Menus.setLayout(null);
 
         dashboardMenu.setBackground(new java.awt.Color(232, 232, 232));
+        dashboardMenu.setMaximumSize(new java.awt.Dimension(994, 695));
+        dashboardMenu.setMinimumSize(new java.awt.Dimension(994, 695));
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel7.setFont(new java.awt.Font("Poppins", 1, 18)); // NOI18N
         jLabel7.setText("Total Balance");
 
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
-        jLabel8.setText("$ 999,999,999.99");
+        totalBalance.setFont(new java.awt.Font("Poppins", 0, 24)); // NOI18N
+        totalBalance.setText("$ 999,999,999.99");
 
+        jLabel9.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
         jLabel9.setText("Recent Transactions");
 
+        jLabel10.setFont(new java.awt.Font("Poppins", 1, 18)); // NOI18N
         jLabel10.setText("Accounts");
 
         dashboardAccounts.setBackground(new java.awt.Color(232, 232, 232));
         dashboardAccounts.setLayout(null);
 
+        accNo3.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         accNo3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/credit_card.png"))); // NOI18N
         dashboardAccounts.add(accNo3);
         accNo3.setBounds(6, 258, 250, 172);
 
+        accNo1.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         accNo1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/credit_card.png"))); // NOI18N
         dashboardAccounts.add(accNo1);
         accNo1.setBounds(6, 43, 250, 172);
 
+        accNo2.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         accNo2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/credit_card.png"))); // NOI18N
         dashboardAccounts.add(accNo2);
         accNo2.setBounds(303, 43, 250, 172);
 
+        accNo4.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         accNo4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/credit_card.png"))); // NOI18N
         dashboardAccounts.add(accNo4);
         accNo4.setBounds(303, 258, 250, 172);
 
+        accNo1Label.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         accNo1Label.setText("Acc 1");
         dashboardAccounts.add(accNo1Label);
-        accNo1Label.setBounds(6, 21, 160, 16);
+        accNo1Label.setBounds(6, 21, 160, 22);
 
+        accNo2Label.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         accNo2Label.setText("Acc 2");
         dashboardAccounts.add(accNo2Label);
-        accNo2Label.setBounds(303, 21, 170, 16);
+        accNo2Label.setBounds(303, 21, 170, 22);
 
+        accNo3Label.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         accNo3Label.setText("Acc 3");
         dashboardAccounts.add(accNo3Label);
-        accNo3Label.setBounds(6, 236, 150, 16);
+        accNo3Label.setBounds(6, 236, 150, 22);
 
+        accNo4Label.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         accNo4Label.setText("Acc 4");
         dashboardAccounts.add(accNo4Label);
-        accNo4Label.setBounds(303, 236, 170, 16);
+        accNo4Label.setBounds(303, 236, 170, 22);
 
+        accNo1Balance.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         accNo1Balance.setText("Acc Balance :");
         dashboardAccounts.add(accNo1Balance);
         accNo1Balance.setBounds(40, 110, 170, 90);
 
+        accNo2Balance.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         accNo2Balance.setText("Acc Balance :");
         dashboardAccounts.add(accNo2Balance);
         accNo2Balance.setBounds(330, 110, 190, 90);
 
+        accNo3Balance.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         accNo3Balance.setText("Acc Balance :");
         dashboardAccounts.add(accNo3Balance);
         accNo3Balance.setBounds(30, 330, 200, 90);
 
+        accNo4Balance.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         accNo4Balance.setText("Acc Balance :");
         dashboardAccounts.add(accNo4Balance);
         accNo4Balance.setBounds(330, 330, 200, 90);
@@ -455,16 +572,16 @@ public class MainBankMenu extends javax.swing.JFrame {
         dashboardMenuLayout.setHorizontalGroup(
             dashboardMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dashboardMenuLayout.createSequentialGroup()
-                .addGap(24, 24, 24)
+                .addGap(22, 22, 22)
                 .addGroup(dashboardMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 58, Short.MAX_VALUE)
+                    .addComponent(totalBalance)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel9))
+                .addGap(31, 31, 31)
                 .addGroup(dashboardMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(dashboardAccounts, javax.swing.GroupLayout.PREFERRED_SIZE, 591, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel10))
-                .addGap(164, 164, 164))
+                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(149, Short.MAX_VALUE))
         );
         dashboardMenuLayout.setVerticalGroup(
             dashboardMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -476,23 +593,129 @@ public class MainBankMenu extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(dashboardMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(dashboardMenuLayout.createSequentialGroup()
-                        .addComponent(jLabel8)
-                        .addGap(57, 57, 57)
+                        .addComponent(totalBalance)
+                        .addGap(18, 18, 18)
                         .addComponent(jLabel9))
                     .addComponent(dashboardAccounts, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(180, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout MenusLayout = new javax.swing.GroupLayout(Menus);
-        Menus.setLayout(MenusLayout);
-        MenusLayout.setHorizontalGroup(
-            MenusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(dashboardMenu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        Menus.add(dashboardMenu);
+        dashboardMenu.setBounds(0, 0, 994, 695);
+
+        accountsMenu.setBackground(new java.awt.Color(232, 232, 232));
+        accountsMenu.setMaximumSize(new java.awt.Dimension(994, 695));
+        accountsMenu.setMinimumSize(new java.awt.Dimension(994, 695));
+        accountsMenu.setPreferredSize(new java.awt.Dimension(994, 695));
+        accountsMenu.setLayout(null);
+
+        jLabel8.setFont(new java.awt.Font("Poppins", 1, 36)); // NOI18N
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel8.setText("ACCOUNTS");
+        accountsMenu.add(jLabel8);
+        jLabel8.setBounds(6, 16, 1130, 55);
+
+        dashboardAccounts1.setBackground(new java.awt.Color(232, 232, 232));
+        dashboardAccounts1.setLayout(null);
+
+        accNo7.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        accNo7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/credit_card.png"))); // NOI18N
+        dashboardAccounts1.add(accNo7);
+        accNo7.setBounds(6, 258, 250, 172);
+
+        accNo5.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        accNo5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/credit_card.png"))); // NOI18N
+        dashboardAccounts1.add(accNo5);
+        accNo5.setBounds(6, 43, 250, 172);
+
+        accNo6.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        accNo6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/credit_card.png"))); // NOI18N
+        dashboardAccounts1.add(accNo6);
+        accNo6.setBounds(303, 43, 250, 172);
+
+        accNo8.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        accNo8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/credit_card.png"))); // NOI18N
+        dashboardAccounts1.add(accNo8);
+        accNo8.setBounds(303, 258, 250, 172);
+
+        accNo5Label.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        accNo5Label.setText("Acc 1");
+        dashboardAccounts1.add(accNo5Label);
+        accNo5Label.setBounds(6, 21, 160, 22);
+
+        accNo6Label.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        accNo6Label.setText("Acc 2");
+        dashboardAccounts1.add(accNo6Label);
+        accNo6Label.setBounds(303, 21, 170, 22);
+
+        accNo7Label.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        accNo7Label.setText("Acc 3");
+        dashboardAccounts1.add(accNo7Label);
+        accNo7Label.setBounds(6, 236, 150, 22);
+
+        accNo8Label.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        accNo8Label.setText("Acc 4");
+        dashboardAccounts1.add(accNo8Label);
+        accNo8Label.setBounds(303, 236, 170, 22);
+
+        accNo5Balance.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        accNo5Balance.setText("Acc Balance :");
+        dashboardAccounts1.add(accNo5Balance);
+        accNo5Balance.setBounds(40, 110, 170, 90);
+
+        accNo6Balance.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        accNo6Balance.setText("Acc Balance :");
+        dashboardAccounts1.add(accNo6Balance);
+        accNo6Balance.setBounds(330, 110, 190, 90);
+
+        accNo7Balance.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        accNo7Balance.setText("Acc Balance :");
+        dashboardAccounts1.add(accNo7Balance);
+        accNo7Balance.setBounds(30, 330, 200, 90);
+
+        accNo8Balance.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        accNo8Balance.setText("Acc Balance :");
+        dashboardAccounts1.add(accNo8Balance);
+        accNo8Balance.setBounds(330, 330, 200, 90);
+
+        accountsMenu.add(dashboardAccounts1);
+        dashboardAccounts1.setBounds(290, 80, 591, 457);
+
+        createAccountButtonPanel.setForeground(new java.awt.Color(60, 63, 65));
+        createAccountButtonPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        createAccountButtonPanel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                createAccountButtonPanelMouseClicked(evt);
+            }
+        });
+
+        jLabel11.setFont(new java.awt.Font("Poppins", 1, 18)); // NOI18N
+        jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel11.setText("Create New Account");
+        jLabel11.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        javax.swing.GroupLayout createAccountButtonPanelLayout = new javax.swing.GroupLayout(createAccountButtonPanel);
+        createAccountButtonPanel.setLayout(createAccountButtonPanelLayout);
+        createAccountButtonPanelLayout.setHorizontalGroup(
+            createAccountButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, createAccountButtonPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                .addContainerGap())
         );
-        MenusLayout.setVerticalGroup(
-            MenusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(dashboardMenu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        createAccountButtonPanelLayout.setVerticalGroup(
+            createAccountButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(createAccountButtonPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
+                .addContainerGap())
         );
+
+        accountsMenu.add(createAccountButtonPanel);
+        createAccountButtonPanel.setBounds(370, 570, 400, 80);
+
+        Menus.add(accountsMenu);
+        accountsMenu.setBounds(-2, -3, 1140, 700);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -501,7 +724,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(TabMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Menus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(Menus, javax.swing.GroupLayout.DEFAULT_SIZE, 934, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -516,9 +739,41 @@ public class MainBankMenu extends javax.swing.JFrame {
         
     }//GEN-LAST:event_settingsTabMouseClicked
 
-    /**
-     * @param args the command line arguments
-     */
+    private void logoutButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_logoutButtonMouseClicked
+        int result = JOptionPane.showConfirmDialog(null,"Sure? You want to log out?", "Log Out?",
+               JOptionPane.YES_NO_OPTION);
+        if(result == 0){
+            this.dispose();
+            new LoginMenu().setVisible(true);
+        }
+    }//GEN-LAST:event_logoutButtonMouseClicked
+
+    private void accountsTabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accountsTabMouseClicked
+        dashboardMenu.setVisible(false);
+        accountsMenu.setVisible(true);
+    }//GEN-LAST:event_accountsTabMouseClicked
+
+    private void dashboardTabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dashboardTabMouseClicked
+        dashboardMenu.setVisible(true);
+        accountsMenu.setVisible(false);
+    }//GEN-LAST:event_dashboardTabMouseClicked
+
+    private void createAccountButtonPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_createAccountButtonPanelMouseClicked
+        String userAccNo = bankDetails.getAccNo();
+
+        ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+        String input = JOptionPane.showInputDialog("Please Enter Your Account Name.");
+        Accounts newAccount = new Accounts(userAccNo, userAccounts.size()+1, 0, input);
+        accounts.add(newAccount);
+        
+        JOptionPane.showMessageDialog(null,"Your new account saved.\ntotal number of accounts " + accounts.size() + "\nuser account size " + userAccounts.size());
+        saveAccountsFile();
+        dispose();
+        new MainBankMenu().setVisible(true);
+        
+    }//GEN-LAST:event_createAccountButtonPanelMouseClicked
+
+   
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -566,12 +821,28 @@ public class MainBankMenu extends javax.swing.JFrame {
     private javax.swing.JLabel accNo4;
     private javax.swing.JLabel accNo4Balance;
     private javax.swing.JLabel accNo4Label;
+    private javax.swing.JLabel accNo5;
+    private javax.swing.JLabel accNo5Balance;
+    private javax.swing.JLabel accNo5Label;
+    private javax.swing.JLabel accNo6;
+    private javax.swing.JLabel accNo6Balance;
+    private javax.swing.JLabel accNo6Label;
+    private javax.swing.JLabel accNo7;
+    private javax.swing.JLabel accNo7Balance;
+    private javax.swing.JLabel accNo7Label;
+    private javax.swing.JLabel accNo8;
+    private javax.swing.JLabel accNo8Balance;
+    private javax.swing.JLabel accNo8Label;
+    private javax.swing.JPanel accountsMenu;
     private javax.swing.JPanel accountsTab;
+    private javax.swing.JPanel createAccountButtonPanel;
     private javax.swing.JPanel dashboardAccounts;
+    private javax.swing.JPanel dashboardAccounts1;
     private javax.swing.JPanel dashboardMenu;
     private javax.swing.JPanel dashboardTab;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -583,6 +854,9 @@ public class MainBankMenu extends javax.swing.JFrame {
     private javax.swing.JPanel logoutButton;
     private javax.swing.JPanel paymentsTab;
     private javax.swing.JPanel settingsTab;
+    private javax.swing.JLabel totalBalance;
     private javax.swing.JPanel transactionsTab;
+    private javax.swing.JLabel welcomeLabel;
+    private javax.swing.JLabel welcomeLabel1;
     // End of variables declaration//GEN-END:variables
 }
