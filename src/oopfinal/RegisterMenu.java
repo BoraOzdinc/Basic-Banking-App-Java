@@ -202,7 +202,8 @@ public class RegisterMenu extends javax.swing.JFrame {
                 .addContainerGap(70, Short.MAX_VALUE))
         );
 
-        pack();
+        setSize(new java.awt.Dimension(475, 450));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

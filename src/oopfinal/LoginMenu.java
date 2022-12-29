@@ -190,7 +190,8 @@ public class LoginMenu extends javax.swing.JFrame {
             .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
-        pack();
+        setSize(new java.awt.Dimension(307, 366));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     
