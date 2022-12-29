@@ -247,7 +247,7 @@ public class RegisterMenu extends javax.swing.JFrame {
     // If all the checks pass, create a BankDetails object with the entered data and add it to the bankDetailsList
     int age = Integer.parseInt(ageStr);
     String accNo = rndAccNo();
-    BankDetails bankDetails = new BankDetails(accNo, password, 0, name, age);
+    BankDetails bankDetails = new BankDetails(accNo, password, name, age);
     bankDetailsList.add(bankDetails);
 
     // Save the bankDetailsList to the BankDetails.dat file

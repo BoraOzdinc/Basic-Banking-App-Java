@@ -9,34 +9,36 @@ import java.util.Date;
  */
 public class Transactions implements Serializable{
     
-    private String senderAccNo;
-    private String receiverAccNo;
+    private String senderName;
+    private String receiverName;
     private Date transactionDate;
     private double amount;
     private String paymentSource;
+    private String note;
 
-    public Transactions(String senderAccNo, String receiverAccNo, Date transactionDate, double amount, String paymentSource) {
-        this.senderAccNo = senderAccNo;
-        this.receiverAccNo = receiverAccNo;
+    public Transactions(String senderName, String receiverName, Date transactionDate, double amount, String paymentSource, String note) {
+        this.senderName = senderName;
+        this.receiverName = receiverName;
         this.transactionDate = transactionDate;
         this.amount = amount;
         this.paymentSource = paymentSource;
+        this.note = note;
     }
 
-    public String getSenderAccNo() {
-        return senderAccNo;
+    public String getSenderName() {
+        return senderName;
     }
 
-    public void setSenderAccNo(String senderAccNo) {
-        this.senderAccNo = senderAccNo;
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
     }
 
-    public String getReceiverAccNo() {
-        return receiverAccNo;
+    public String getReceiverName() {
+        return receiverName;
     }
 
-    public void setReceiverAccNo(String receiverAccNo) {
-        this.receiverAccNo = receiverAccNo;
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
     }
 
     public Date getTransactionDate() {
@@ -62,5 +64,14 @@ public class Transactions implements Serializable{
     public void setPaymentSource(String paymentSource) {
         this.paymentSource = paymentSource;
     }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
     
 }

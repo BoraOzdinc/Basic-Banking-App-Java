@@ -20,6 +20,8 @@ public class MainBankMenu extends javax.swing.JFrame {
     LoginMenu l = new LoginMenu();
     
     public static int userIndex;
+    public static int accNumberCounter = 1;
+    public static int lastPage = 1;
     BankDetails bankDetails = r.bankDetailsList.get(userIndex);
     
     ArrayList<Transactions> transactions;
@@ -29,15 +31,47 @@ public class MainBankMenu extends javax.swing.JFrame {
     String userAccNo = bankDetails.getAccNo();
     
     
-    public MainBankMenu() {     
-        initComponents();
+    public MainBankMenu() {
         accounts = new ArrayList<Accounts>();
         
-        
+        initComponents();
         r.populateBankDetailsList();
         populateAccounts();
+        accountDashboard();
+        lastPage(lastPage);
         
-        accountDashboard();        
+        ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+        
+        String [] userAccountArray = new String[userAccounts.size()];
+        for (int i=0; i<userAccounts.size(); i++){
+            userAccountArray[i] = userAccounts.get(i).getAccountName();
+        }
+        accFromComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
+        accToComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
+        
+        
+                
+    }
+    
+    public void lastPage(int x){
+        switch (x) {
+            case 1 -> {
+                paymentsMenu.setVisible(false);
+                dashboardMenu.setVisible(true);
+                accountsMenu.setVisible(false);
+            }
+            case 2 -> {
+                paymentsMenu.setVisible(false);
+                dashboardMenu.setVisible(false);
+                accountsMenu.setVisible(true);
+            }
+            case 3 -> {
+                paymentsMenu.setVisible(true);
+                dashboardMenu.setVisible(false);
+                accountsMenu.setVisible(false);
+            }
+            default -> throw new AssertionError();
+        }
     }
     
     public void saveAccountsFile(){
@@ -58,7 +92,7 @@ public class MainBankMenu extends javax.swing.JFrame {
     }
 }
 
-  public void populateAccounts(){
+    public void populateAccounts(){
     try{
         // Create a FileInputStream to read from the BankDetails.dat file
         FileInputStream file = new FileInputStream("Accounts.dat");
@@ -85,18 +119,24 @@ public class MainBankMenu extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null,e);
     }
 }
+    
     public void accountDashboard(){
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
         
         welcomeLabel.setText(bankDetails.getName());
-        double d = bankDetails.getBalance();
+        
+        double x = 0;
+        for(int i = 0 ; i < userAccounts.size() ; i++){
+            x += userAccounts.get(i).getBalanceOfAccount();
+        }
+        
         DecimalFormat df = new DecimalFormat("#.00");
-        String s = df.format(d);
-        if(bankDetails.getBalance() == 0.0){
+        String s = df.format(x);
+        if(x == 0.0){
             totalBalance.setText("$ 0.00");
         }
         else{
-            totalBalance.setText("$ "+s);
+            totalBalance.setText("$ "+ s);
         }
         
         if(userAccounts.size() == 0){
@@ -129,9 +169,9 @@ public class MainBankMenu extends javax.swing.JFrame {
             accNo8Balance.setVisible(false);
             accNo8Trash.setVisible(false);
             accNo1Label.setText(userAccounts.get(0).getAccountName());
-            accNo1Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+            accNo1Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
             accNo5Label.setText(userAccounts.get(0).getAccountName());
-            accNo5Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+            accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
         }
         else if(userAccounts.size() == 2){
             dashboardAccounts.setVisible(true);           
@@ -150,13 +190,13 @@ public class MainBankMenu extends javax.swing.JFrame {
             accNo8Balance.setVisible(false);
             accNo8Trash.setVisible(false);
             accNo1Label.setText(userAccounts.get(0).getAccountName());
-            accNo1Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+            accNo1Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
             accNo2Label.setText(userAccounts.get(1).getAccountName());
-            accNo2Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+            accNo2Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
             accNo5Label.setText(userAccounts.get(0).getAccountName());
-            accNo5Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+            accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
             accNo6Label.setText(userAccounts.get(1).getAccountName());
-            accNo6Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+            accNo6Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
         }
         else if(userAccounts.size() == 3){
             dashboardAccounts.setVisible(true);           
@@ -168,17 +208,17 @@ public class MainBankMenu extends javax.swing.JFrame {
             accNo8Balance.setVisible(false);
             accNo8Trash.setVisible(false);
             accNo1Label.setText(userAccounts.get(0).getAccountName());
-            accNo1Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+            accNo1Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
             accNo2Label.setText(userAccounts.get(1).getAccountName());
-            accNo2Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+            accNo2Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
             accNo3Label.setText(userAccounts.get(2).getAccountName());
-            accNo3Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+            accNo3Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
             accNo5Label.setText(userAccounts.get(0).getAccountName());
-            accNo5Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+            accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
             accNo6Label.setText(userAccounts.get(1).getAccountName());
-            accNo6Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+            accNo6Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
             accNo7Label.setText(userAccounts.get(2).getAccountName());
-            accNo7Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+            accNo7Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
             
         }
         else if(userAccounts.size() == 4){
@@ -293,8 +333,16 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
         jLabel13 = new javax.swing.JLabel();
         sendPerson = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
-        senAccPanel = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
+        sendAccPanel = new javax.swing.JPanel();
+        confirmAccButton = new javax.swing.JPanel();
+        jLabel15 = new javax.swing.JLabel();
+        accFromComboBox = new javax.swing.JComboBox<>();
+        accToComboBox = new javax.swing.JComboBox<>();
+        jLabel17 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
+        sendAccAmount = new javax.swing.JTextField();
+        jLabel19 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(1200, 695));
@@ -394,6 +442,11 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
         );
 
         paymentsTab.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        paymentsTab.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                paymentsTabMouseClicked(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -796,12 +849,13 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel12.setText("PAYMENTS");
 
+        sendAccount.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         sendAccount.setMaximumSize(new java.awt.Dimension(210, 60));
         sendAccount.setMinimumSize(new java.awt.Dimension(210, 60));
 
         jLabel13.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel13.setText("Send Between Accounts");
+        jLabel13.setText("transfer to my own account");
         jLabel13.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         javax.swing.GroupLayout sendAccountLayout = new javax.swing.GroupLayout(sendAccount);
@@ -821,9 +875,11 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
                 .addContainerGap())
         );
 
+        sendPerson.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
         jLabel14.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel14.setText("Send to Person");
+        jLabel14.setText("transfer to another account");
         jLabel14.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         javax.swing.GroupLayout sendPersonLayout = new javax.swing.GroupLayout(sendPerson);
@@ -843,50 +899,94 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
                 .addContainerGap())
         );
 
-        senAccPanel.setBackground(new java.awt.Color(232, 232, 232));
+        sendAccPanel.setBackground(new java.awt.Color(232, 232, 232));
+        sendAccPanel.setLayout(null);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 250, Short.MAX_VALUE)
+        confirmAccButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        confirmAccButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                confirmAccButtonMouseClicked(evt);
+            }
+        });
+
+        jLabel15.setFont(new java.awt.Font("Poppins", 1, 18)); // NOI18N
+        jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel15.setText("Confirm");
+        jLabel15.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        javax.swing.GroupLayout confirmAccButtonLayout = new javax.swing.GroupLayout(confirmAccButton);
+        confirmAccButton.setLayout(confirmAccButtonLayout);
+        confirmAccButtonLayout.setHorizontalGroup(
+            confirmAccButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(confirmAccButtonLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 65, Short.MAX_VALUE)
+        confirmAccButtonLayout.setVerticalGroup(
+            confirmAccButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(confirmAccButtonLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
-        javax.swing.GroupLayout senAccPanelLayout = new javax.swing.GroupLayout(senAccPanel);
-        senAccPanel.setLayout(senAccPanelLayout);
-        senAccPanelLayout.setHorizontalGroup(
-            senAccPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(senAccPanelLayout.createSequentialGroup()
-                .addGap(373, 373, 373)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(373, Short.MAX_VALUE))
-        );
-        senAccPanelLayout.setVerticalGroup(
-            senAccPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, senAccPanelLayout.createSequentialGroup()
-                .addContainerGap(394, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(72, 72, 72))
-        );
+        sendAccPanel.add(confirmAccButton);
+        confirmAccButton.setBounds(337, 406, 250, 65);
+
+        accFromComboBox.setFont(new java.awt.Font("Poppins", 0, 18)); // NOI18N
+        accFromComboBox.setMaximumRowCount(4);
+        sendAccPanel.add(accFromComboBox);
+        accFromComboBox.setBounds(340, 60, 250, 65);
+
+        accToComboBox.setFont(new java.awt.Font("Poppins", 0, 18)); // NOI18N
+        accToComboBox.setMaximumRowCount(4);
+        sendAccPanel.add(accToComboBox);
+        accToComboBox.setBounds(340, 200, 250, 65);
+
+        jLabel17.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel17.setText("From");
+        sendAccPanel.add(jLabel17);
+        jLabel17.setBounds(337, 39, 35, 22);
+
+        jLabel18.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel18.setText("Amout");
+        sendAccPanel.add(jLabel18);
+        jLabel18.setBounds(340, 290, 60, 22);
+
+        jLabel16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/switch_icon.png"))); // NOI18N
+        jLabel16.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel16.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel16MouseClicked(evt);
+            }
+        });
+        sendAccPanel.add(jLabel16);
+        jLabel16.setBounds(430, 130, 48, 48);
+
+        sendAccAmount.setFont(new java.awt.Font("Poppins", 0, 18)); // NOI18N
+        sendAccPanel.add(sendAccAmount);
+        sendAccAmount.setBounds(340, 310, 250, 60);
+
+        jLabel19.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel19.setText("To");
+        sendAccPanel.add(jLabel19);
+        jLabel19.setBounds(340, 180, 17, 22);
 
         javax.swing.GroupLayout paymentsMenuLayout = new javax.swing.GroupLayout(paymentsMenu);
         paymentsMenu.setLayout(paymentsMenuLayout);
         paymentsMenuLayout.setHorizontalGroup(
             paymentsMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(sendAccPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(paymentsMenuLayout.createSequentialGroup()
-                .addGroup(paymentsMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 990, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(paymentsMenuLayout.createSequentialGroup()
-                        .addGap(148, 148, 148)
-                        .addComponent(sendAccount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(278, 278, 278)
-                        .addComponent(sendPerson, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(116, 116, 116)
+                .addComponent(sendAccount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(278, 278, 278)
+                .addComponent(sendPerson, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(senAccPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(paymentsMenuLayout.createSequentialGroup()
+                .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 937, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         paymentsMenuLayout.setVerticalGroup(
             paymentsMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -898,11 +998,11 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
                     .addComponent(sendAccount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(sendPerson, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(senAccPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(sendAccPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         Menus.add(paymentsMenu);
-        paymentsMenu.setBounds(0, 0, 940, 700);
+        paymentsMenu.setBounds(0, 0, 930, 690);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -937,11 +1037,15 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
     }//GEN-LAST:event_logoutButtonMouseClicked
 
     private void accountsTabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accountsTabMouseClicked
+        lastPage = 2;
+        paymentsMenu.setVisible(false);
         dashboardMenu.setVisible(false);
         accountsMenu.setVisible(true);
     }//GEN-LAST:event_accountsTabMouseClicked
 
     private void dashboardTabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dashboardTabMouseClicked
+        lastPage = 1;
+        paymentsMenu.setVisible(false);
         dashboardMenu.setVisible(true);
         accountsMenu.setVisible(false);
     }//GEN-LAST:event_dashboardTabMouseClicked
@@ -953,13 +1057,20 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
         }
         else{
             String input = JOptionPane.showInputDialog("Please Enter Your Account Name.");
-        Accounts newAccount = new Accounts(userAccNo, userAccounts.size()+1, 0, input);
-        accounts.add(newAccount);
+            if(input.isEmpty()){
+                JOptionPane.showMessageDialog(null, "You have to enter a name to your account!");
+            }
+            else{
+               Accounts newAccount = new Accounts(userAccNo, accNumberCounter, 0, input);
+               
+                accounts.add(newAccount);
         
-        JOptionPane.showMessageDialog(null,"Your new account saved.");
-        saveAccountsFile();
-        dispose();
-        new MainBankMenu().setVisible(true);
+                JOptionPane.showMessageDialog(null,"Your new account saved.");
+                saveAccountsFile();
+                accNumberCounter++;
+                dispose();
+                new MainBankMenu().setVisible(true); 
+            }       
         }      
     }//GEN-LAST:event_createAccountButtonPanelMouseClicked
 
@@ -972,7 +1083,7 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
             accounts.remove(accountToRemove);
             
             saveAccountsFile();
-            
+            accNumberCounter--;
             dispose();
             new MainBankMenu().setVisible(true);
             
@@ -988,7 +1099,7 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
             accounts.remove(accountToRemove);
             
             saveAccountsFile();
-            
+            accNumberCounter--;
             dispose();
             new MainBankMenu().setVisible(true);
             
@@ -1004,7 +1115,7 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
             accounts.remove(accountToRemove);
             
             saveAccountsFile();
-            
+            accNumberCounter--;
             dispose();
             new MainBankMenu().setVisible(true);
             
@@ -1020,12 +1131,71 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
             accounts.remove(accountToRemove);
             
             saveAccountsFile();
-            
+            accNumberCounter--;
             dispose();
             new MainBankMenu().setVisible(true);
             
         }
     }//GEN-LAST:event_accNo8TrashMouseClicked
+
+    private void paymentsTabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paymentsTabMouseClicked
+        lastPage = 3;
+        paymentsMenu.setVisible(true);
+        dashboardMenu.setVisible(false);
+        accountsMenu.setVisible(false);
+    }//GEN-LAST:event_paymentsTabMouseClicked
+
+    private void jLabel16MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel16MouseClicked
+        int senderAccIndex = accFromComboBox.getSelectedIndex();
+        int receverAccIndex = accToComboBox.getSelectedIndex();
+        accFromComboBox.setSelectedIndex(receverAccIndex);
+        accToComboBox.setSelectedIndex(senderAccIndex);
+    }//GEN-LAST:event_jLabel16MouseClicked
+
+    private void confirmAccButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_confirmAccButtonMouseClicked
+        ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+        int senderAccIndex = accFromComboBox.getSelectedIndex();
+        int receiverAccIndex = accToComboBox.getSelectedIndex();
+        double senderBalance = userAccounts.get(senderAccIndex).getBalanceOfAccount();
+        double amountInput; 
+        
+        
+        if(senderAccIndex == receiverAccIndex){
+            JOptionPane.showMessageDialog(null, "You cannot transfer money to the same account!","Error!",JOptionPane.WARNING_MESSAGE);
+        }
+        else if(senderAccIndex == -1 || receiverAccIndex == -1){
+            int x = JOptionPane.showConfirmDialog(null, "You don't have any account.\nDo you want to open a new account?", "No Account!", JOptionPane.YES_NO_OPTION);
+            if(x == 0){
+                accountsTabMouseClicked(evt);
+                createAccountButtonPanelMouseClicked(evt);
+            }
+        }
+        else{
+            try {
+                amountInput = Double.parseDouble(sendAccAmount.getText().trim());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if(amountInput > senderBalance){
+                JOptionPane.showMessageDialog(null, "Insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            }
+            else{
+                Accounts senderAccount = userAccounts.get(senderAccIndex);
+                Accounts receiverAccount = userAccounts.get(receiverAccIndex);
+                
+                senderAccount.setBalanceOfAccount(senderAccount.getBalanceOfAccount()-amountInput);
+                receiverAccount.setBalanceOfAccount(receiverAccount.getBalanceOfAccount()+amountInput);
+                
+                accounts.set(accounts.indexOf(userAccounts.get(senderAccIndex)), senderAccount);
+                accounts.set(accounts.indexOf(userAccounts.get(receiverAccIndex)), receiverAccount);
+                saveAccountsFile();
+                JOptionPane.showMessageDialog(null, "The transfer was successful!");
+                dispose();
+                new MainBankMenu().setVisible(true);
+            }
+        }
+    }//GEN-LAST:event_confirmAccButtonMouseClicked
 
    
     public static void main(String args[]) {
@@ -1063,6 +1233,7 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Menus;
     private javax.swing.JPanel TabMenu;
+    private javax.swing.JComboBox<String> accFromComboBox;
     private javax.swing.JLabel accNo1;
     private javax.swing.JLabel accNo1Balance;
     private javax.swing.JLabel accNo1Label;
@@ -1091,8 +1262,10 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
     private javax.swing.JLabel accNo8Balance;
     private javax.swing.JLabel accNo8Label;
     private javax.swing.JLabel accNo8Trash;
+    private javax.swing.JComboBox<String> accToComboBox;
     private javax.swing.JPanel accountsMenu;
     private javax.swing.JPanel accountsTab;
+    private javax.swing.JPanel confirmAccButton;
     private javax.swing.JPanel createAccountButtonPanel;
     private javax.swing.JPanel dashboardAccounts;
     private javax.swing.JPanel dashboardAccounts1;
@@ -1104,6 +1277,11 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1112,11 +1290,11 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel logoutButton;
     private javax.swing.JPanel paymentsMenu;
     private javax.swing.JPanel paymentsTab;
-    private javax.swing.JPanel senAccPanel;
+    private javax.swing.JTextField sendAccAmount;
+    private javax.swing.JPanel sendAccPanel;
     private javax.swing.JPanel sendAccount;
     private javax.swing.JPanel sendPerson;
     private javax.swing.JPanel settingsTab;

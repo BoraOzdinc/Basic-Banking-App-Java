@@ -12,14 +12,14 @@ public class BankDetails implements Serializable{
     
     private String accNo;
     private String password;
-    private double balance;
+    
     private String name;
     private int age;
 
-    public BankDetails(String accNo, String password, double balance, String name, int age) {
+    public BankDetails(String accNo, String password, String name, int age) {
         this.accNo = accNo;
         this.password = password;
-        this.balance = balance;
+        
         this.name = name;
         this.age = age;
     }
@@ -53,14 +53,6 @@ public class BankDetails implements Serializable{
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public double getBalance() {
-        return balance;
-    }
-
-    public void setBalance(double balance) {
-        this.balance = balance;
     }
 
     public String getName() {
