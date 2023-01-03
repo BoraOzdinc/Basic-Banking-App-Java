@@ -1,6 +1,8 @@
 package oopfinal;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -9,43 +11,43 @@ import java.util.Date;
  */
 public class Transactions implements Serializable{
     
-    private String senderName;
-    private String receiverName;
-    private Date transactionDate;
+    private String senderAccNo;
+    private String receiverAccNo;
+    private String transactionDate;
     private double amount;
     private String paymentSource;
     private String note;
 
-    public Transactions(String senderName, String receiverName, Date transactionDate, double amount, String paymentSource, String note) {
-        this.senderName = senderName;
-        this.receiverName = receiverName;
+    public Transactions(String senderAccNo, String receiverAccNo, String transactionDate, double amount, String paymentSource, String note) {
+        this.senderAccNo = senderAccNo;
+        this.receiverAccNo = receiverAccNo;
         this.transactionDate = transactionDate;
         this.amount = amount;
         this.paymentSource = paymentSource;
         this.note = note;
     }
 
-    public String getSenderName() {
-        return senderName;
+    public String getSenderAccNo() {
+        return senderAccNo;
     }
 
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
+    public void setSenderAccNo(String senderAccNo) {
+        this.senderAccNo = senderAccNo;
     }
 
-    public String getReceiverName() {
-        return receiverName;
+    public String getReceiverAccNo() {
+        return receiverAccNo;
     }
 
-    public void setReceiverName(String receiverName) {
-        this.receiverName = receiverName;
+    public void setReceiverAccNo(String receiverAccNo) {
+        this.receiverAccNo = receiverAccNo;
     }
 
-    public Date getTransactionDate() {
+    public String getTransactionDate() {
         return transactionDate;
     }
 
-    public void setTransactionDate(Date transactionDate) {
+    public void setTransactionDate(String transactionDate) {
         this.transactionDate = transactionDate;
     }
 

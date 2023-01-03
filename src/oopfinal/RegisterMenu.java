@@ -214,7 +214,7 @@ public class RegisterMenu extends javax.swing.JFrame {
     private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
         // Create a LoginMenu object to access the isFourDigit function
     LoginMenu l = new LoginMenu();
-
+    MainBankMenu mb = new MainBankMenu();
     // Get the name, password, and age from the text fields
     String name = this.registerName.getText().trim();
     String password = this.registerPassword.getText().trim();
@@ -248,10 +248,13 @@ public class RegisterMenu extends javax.swing.JFrame {
     int age = Integer.parseInt(ageStr);
     String accNo = rndAccNo();
     BankDetails bankDetails = new BankDetails(accNo, password, name, age);
+    Accounts mainAccount = new Accounts(accNo, 1, 0, "Main Account");
+    mb.accounts.add(mainAccount);
     bankDetailsList.add(bankDetails);
 
     // Save the bankDetailsList to the BankDetails.dat file
     saveBankDetailsToFile();
+    mb.saveAccountsFile();
 
     // Show a success message with the account number
     JOptionPane.showMessageDialog(null, "Successfully Registered!\nHello " + name + " Your Account Number is " + accNo + "\nPlease remember your account number!");
