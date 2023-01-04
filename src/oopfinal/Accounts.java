@@ -1,4 +1,3 @@
-
 package oopfinal;
 
 import java.io.Serializable;
@@ -7,8 +6,10 @@ import java.io.Serializable;
  *
  * @author borao
  */
-public class Accounts implements Serializable{
-    
+public class Accounts implements Serializable {
+
+    private static final long serialVersionUID = -695257841392802020L;
+
     private String accNo;
     private int numberOfAccount;
     private double balanceOfAccount;
@@ -52,6 +53,5 @@ public class Accounts implements Serializable{
     public void setBalanceOfAccount(double balanceOfAccount) {
         this.balanceOfAccount = balanceOfAccount;
     }
-    
-    
+
 }

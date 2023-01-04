@@ -1,4 +1,3 @@
-
 package oopfinal;
 
 import java.io.Serializable;
@@ -7,37 +6,36 @@ import java.io.Serializable;
  *
  * @author borao
  */
-public class BankDetails implements Serializable{
+public class BankDetails implements Serializable {
+
     private static final long serialVersionUID = 6529685098267757690L;
-    
+
     private String accNo;
     private String password;
-    
+
     private String name;
     private int age;
 
     public BankDetails(String accNo, String password, String name, int age) {
         this.accNo = accNo;
         this.password = password;
-        
+
         this.name = name;
         this.age = age;
     }
 
-    
     @Override
     public String toString() {
         RegisterMenu r = new RegisterMenu();
 
         String results = "";
 
-        for(BankDetails d : r.bankDetailsList) {
+        for (BankDetails d : r.bankDetailsList) {
 
-            results += d.toString(); 
+            results += d.toString();
+        }
+        return results;
     }
-    return results;
-  }
-    
 
     public String getAccNo() {
         return accNo;
@@ -70,7 +68,5 @@ public class BankDetails implements Serializable{
     public void setAge(int age) {
         this.age = age;
     }
-    
-    
-    
+
 }

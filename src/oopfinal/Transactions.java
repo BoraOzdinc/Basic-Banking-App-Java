@@ -9,22 +9,23 @@ import java.util.Date;
  *
  * @author borao
  */
-public class Transactions implements Serializable{
-    
+public class Transactions implements Serializable {
+
+    private static final long serialVersionUID = -6053234864767433320L;
+
     private String senderAccNo;
     private String receiverAccNo;
     private String transactionDate;
     private double amount;
     private String paymentSource;
-    private String note;
 
-    public Transactions(String senderAccNo, String receiverAccNo, String transactionDate, double amount, String paymentSource, String note) {
+    public Transactions(String senderAccNo, String receiverAccNo, String transactionDate, double amount, String paymentSource) {
         this.senderAccNo = senderAccNo;
         this.receiverAccNo = receiverAccNo;
         this.transactionDate = transactionDate;
         this.amount = amount;
         this.paymentSource = paymentSource;
-        this.note = note;
+
     }
 
     public String getSenderAccNo() {
@@ -67,13 +68,4 @@ public class Transactions implements Serializable{
         this.paymentSource = paymentSource;
     }
 
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    
 }

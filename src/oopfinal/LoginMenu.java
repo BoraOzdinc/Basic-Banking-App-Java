@@ -7,81 +7,72 @@ import javax.swing.JOptionPane;
  * @author borao
  */
 public class LoginMenu extends javax.swing.JFrame {
-    
+
     RegisterMenu r = new RegisterMenu();
-    
+
     public String userAccNo;
-    
-    
-    
+
     public LoginMenu() {
-        
-        
+
         initComponents();
-        
+
         r.populateBankDetailsList();
-        
+
     }
-    
-    
-    boolean numberOrNot(String input)
-    {
-        try
-        {
+
+    boolean numberOrNot(String input) {
+        try {
             Integer.parseInt(input);
         }
-        catch(NumberFormatException ex)
-        {
+        catch (NumberFormatException ex) {
             return false;
         }
-        
+
         return true;
     }
 
-    public boolean isSixDigit(String accNo){
+    public boolean isSixDigit(String accNo) {
         if (numberOrNot(accNo)) {
-                if (String.valueOf(accNo).length() == 6) {
-                    return true;
-                } 
-                else {
-                    return false;
-                }
-                
-        }
-        else{
+            if (String.valueOf(accNo).length() == 6) {
+                return true;
+            }
+            else {
                 return false;
             }
-    }
-    
-    public boolean isFourDigit(String accNo){
-        if (numberOrNot(accNo)) {
-                if (String.valueOf(accNo).length() == 4) {
-                    return true;
-                } 
-                else {
-                    return false;
-                }
-                
+
         }
-        else{
+        else {
+            return false;
+        }
+    }
+
+    public boolean isFourDigit(String accNo) {
+        if (numberOrNot(accNo)) {
+            if (String.valueOf(accNo).length() == 4) {
+                return true;
+            }
+            else {
                 return false;
             }
+
+        }
+        else {
+            return false;
+        }
     }
-    
+
     @Override
     public String toString() {
         RegisterMenu r = new RegisterMenu();
 
         String results = "";
 
-        for(BankDetails d : r.bankDetailsList) {
+        for (BankDetails d : r.bankDetailsList) {
 
-            results += d.toString(); 
+            results += d.toString();
+        }
+        return results;
     }
-    return results;
-  }
-        
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -194,7 +185,6 @@ public class LoginMenu extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    
     // This function is called when the "login" button is clicked. It gets the account number and password from the text fields,
     // and checks if they are valid. If they are valid, it searches the bankDetailsList for a BankDetails object with a matching
     // account number. If a matching object is found, it checks if the password matches. If both the account number and password
@@ -203,61 +193,61 @@ public class LoginMenu extends javax.swing.JFrame {
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
         // Create a new RegisterMenu object
-    RegisterMenu r = new RegisterMenu();
-    
-    int userIndx = -1;
-    
-    // Check if the account number and password fields are empty
-    if (this.accountNoLogin.getText().isEmpty() || this.passwordLogin.getText().isEmpty()) {
-        // Display error message if either field is empty
-        JOptionPane.showMessageDialog(null, "You Have To Fill All The Details!");
-    }
-    else if (!isSixDigit(this.accountNoLogin.getText())){
-        // Display error message if the account number is not a 6-digit string
-        JOptionPane.showMessageDialog(null, "Account No must be 6 digit long and Cannot contain any special characters!");
-    }
-    else if(!isFourDigit(this.passwordLogin.getText())){
-        // Display error message if the password is not a 4-digit string
-        JOptionPane.showMessageDialog(null, "Password must be 4 digit long and cannot Contain any special characters!");
-    }
-    else {
-        // If both the account number and password are in the correct format, search for a matching account number in the bankDetailsList
-        String accNoInput = this.accountNoLogin.getText().trim();
-        int userIndex = -1;
-        for (int i = 0; i < r.bankDetailsList.size(); i++) {
-            BankDetails userDetails = r.bankDetailsList.get(i);
-            // If a matching account number is found, store the index and retrieve the BankDetails object
-            if(Integer.parseInt(userDetails.getAccNo()) == Integer.parseInt(accNoInput)){                
-                userIndex = i;
-                MainBankMenu.userIndex = userIndex;
-                               
-                System.out.println("userindex: "+userIndex+"\naccno: "+userDetails.getAccNo()+"\nname: " + userDetails.getName() + "\npass: " + userDetails.getPassword() +
-                        "\nage: " + userDetails.getAge());
-                break;
-            }
+        RegisterMenu r = new RegisterMenu();
+
+        int userIndx = -1;
+
+        // Check if the account number and password fields are empty
+        if (this.accountNoLogin.getText().isEmpty() || this.passwordLogin.getText().isEmpty()) {
+            // Display error message if either field is empty
+            JOptionPane.showMessageDialog(null, "You Have To Fill All The Details!");
         }
-        
-        // If the account number is not found, display an error message
-        if(userIndex == -1){
-            JOptionPane.showMessageDialog(null, "Your Account Number or Password is invalid!");
+        else if (!isSixDigit(this.accountNoLogin.getText())) {
+            // Display error message if the account number is not a 6-digit string
+            JOptionPane.showMessageDialog(null, "Account No must be 6 digit long and Cannot contain any special characters!");
+        }
+        else if (!isFourDigit(this.passwordLogin.getText())) {
+            // Display error message if the password is not a 4-digit string
+            JOptionPane.showMessageDialog(null, "Password must be 4 digit long and cannot Contain any special characters!");
         }
         else {
-            // If the account number is found, retrieve the BankDetails object and check if the password matches
-            BankDetails userDetails = r.bankDetailsList.get(userIndex);
-            if(!userDetails.getPassword().equals(this.passwordLogin.getText().trim())){
-                // Display error message if the password is incorrect
+            // If both the account number and password are in the correct format, search for a matching account number in the bankDetailsList
+            String accNoInput = this.accountNoLogin.getText().trim();
+            int userIndex = -1;
+            for (int i = 0; i < r.bankDetailsList.size(); i++) {
+                BankDetails userDetails = r.bankDetailsList.get(i);
+                // If a matching account number is found, store the index and retrieve the BankDetails object
+                if (Integer.parseInt(userDetails.getAccNo()) == Integer.parseInt(accNoInput)) {
+                    userIndex = i;
+                    MainBankMenu.userIndex = userIndex;
+
+                    System.out.println("userindex: " + userIndex + "\naccno: " + userDetails.getAccNo() + "\nname: " + userDetails.getName() + "\npass: " + userDetails.getPassword()
+                            + "\nage: " + userDetails.getAge());
+                    break;
+                }
+            }
+
+            // If the account number is not found, display an error message
+            if (userIndex == -1) {
                 JOptionPane.showMessageDialog(null, "Your Account Number or Password is invalid!");
             }
             else {
-                // If the password is correct, display a success message and show the MainBankMenu form
-                JOptionPane.showMessageDialog(null, "Successfully logged in!\nHello " + userDetails.getName());
-          
-                new MainBankMenu().setVisible(true);
-                dispose();
-                
+                // If the account number is found, retrieve the BankDetails object and check if the password matches
+                BankDetails userDetails = r.bankDetailsList.get(userIndex);
+                if (!userDetails.getPassword().equals(this.passwordLogin.getText().trim())) {
+                    // Display error message if the password is incorrect
+                    JOptionPane.showMessageDialog(null, "Your Account Number or Password is invalid!");
+                }
+                else {
+                    // If the password is correct, display a success message and show the MainBankMenu form
+                    JOptionPane.showMessageDialog(null, "Successfully logged in!\nHello " + userDetails.getName());
+
+                    new MainBankMenu().setVisible(true);
+                    dispose();
+
+                }
             }
         }
-    }
     }//GEN-LAST:event_loginButtonActionPerformed
 
     private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
@@ -278,13 +268,17 @@ public class LoginMenu extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
+        }
+        catch (ClassNotFoundException ex) {
             java.util.logging.Logger.getLogger(LoginMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
+        }
+        catch (InstantiationException ex) {
             java.util.logging.Logger.getLogger(LoginMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
+        }
+        catch (IllegalAccessException ex) {
             java.util.logging.Logger.getLogger(LoginMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        }
+        catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(LoginMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
@@ -308,5 +302,4 @@ public class LoginMenu extends javax.swing.JFrame {
     private javax.swing.JButton registerButton;
     // End of variables declaration//GEN-END:variables
 
-    
 }

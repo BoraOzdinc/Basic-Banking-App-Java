@@ -1,4 +1,3 @@
-
 package oopfinal;
 
 import java.io.EOFException;
@@ -16,94 +15,92 @@ import javax.swing.JOptionPane;
  * @author borao
  */
 public class RegisterMenu extends javax.swing.JFrame {
-    
+
     ArrayList<BankDetails> bankDetailsList;
-    
+
     public RegisterMenu() {
-    // Initialize the bankDetailsList as an ArrayList of BankDetails objects
-    bankDetailsList = new ArrayList<BankDetails>();
-    
-    // Initialize the GUI components
-    initComponents();
-    
-    // Populate the bankDetailsList with data from the BankDetails.dat file
-    populateBankDetailsList();
-}
+        // Initialize the bankDetailsList as an ArrayList of BankDetails objects
+        bankDetailsList = new ArrayList<BankDetails>();
 
-    
-    public void populateBankDetailsList(){
-    try{
-        // Create a FileInputStream to read from the BankDetails.dat file
-        FileInputStream file = new FileInputStream("BankDetails.dat");
-        // Create an ObjectInputStream using the FileInputStream
-        ObjectInputStream inputFile = new ObjectInputStream(file);
-        
-        // Flag to indicate whether the end of the file has been reached
-        boolean endOfFile = false;
-        // Loop until the end of the file is reached
-        while (!endOfFile){
-            try{
-                // Read an object from the ObjectInputStream and add it to the bankDetailsList
-                bankDetailsList.add((BankDetails) inputFile.readObject());
-            } catch(EOFException e){
-                // If an EOFException is thrown, set the endOfFile flag to true to exit the loop
-                endOfFile = true;
-            } catch(Exception f){
-                // Catch any other exceptions and ignore them
+        // Initialize the GUI components
+        initComponents();
+
+        // Populate the bankDetailsList with data from the BankDetails.dat file
+        populateBankDetailsList();
+    }
+
+    public void populateBankDetailsList() {
+        try {
+            // Create a FileInputStream to read from the BankDetails.dat file
+            FileInputStream file = new FileInputStream("BankDetails.dat");
+            // Create an ObjectInputStream using the FileInputStream
+            ObjectInputStream inputFile = new ObjectInputStream(file);
+
+            // Flag to indicate whether the end of the file has been reached
+            boolean endOfFile = false;
+            // Loop until the end of the file is reached
+            while (!endOfFile) {
+                try {
+                    // Read an object from the ObjectInputStream and add it to the bankDetailsList
+                    bankDetailsList.add((BankDetails) inputFile.readObject());
+                }
+                catch (EOFException e) {
+                    // If an EOFException is thrown, set the endOfFile flag to true to exit the loop
+                    endOfFile = true;
+                }
+                catch (Exception f) {
+                    // Catch any other exceptions and ignore them
+                }
             }
+            // Close the ObjectInputStream
+            inputFile.close();
         }
-        // Close the ObjectInputStream
-        inputFile.close();
-    } catch(IOException e){
-        // Catch any IOExceptions and ignore them
-    }
-}
-
-    
-    
-    public void saveBankDetailsToFile(){
-    try{
-        // Create a FileOutputStream to write to the BankDetails.dat file
-        FileOutputStream file2 = new FileOutputStream("BankDetails.dat");
-        // Create an ObjectOutputStream using the FileOutputStream
-        ObjectOutputStream outputFile2 = new ObjectOutputStream(file2);
-        
-        // Loop through the bankDetailsList and write each object to the ObjectOutputStream
-        for (int i = 0; i < bankDetailsList.size(); i++) {
-            outputFile2.writeObject(bankDetailsList.get(i));
+        catch (IOException e) {
+            // Catch any IOExceptions and ignore them
         }
-        // Close the ObjectOutputStream
-        outputFile2.close();
-    } catch(IOException e){
-        // Catch any IOExceptions and ignore them
     }
-}
 
-    
+    public void saveBankDetailsToFile() {
+        try {
+            // Create a FileOutputStream to write to the BankDetails.dat file
+            FileOutputStream file2 = new FileOutputStream("BankDetails.dat");
+            // Create an ObjectOutputStream using the FileOutputStream
+            ObjectOutputStream outputFile2 = new ObjectOutputStream(file2);
+
+            // Loop through the bankDetailsList and write each object to the ObjectOutputStream
+            for (int i = 0; i < bankDetailsList.size(); i++) {
+                outputFile2.writeObject(bankDetailsList.get(i));
+            }
+            // Close the ObjectOutputStream
+            outputFile2.close();
+        }
+        catch (IOException e) {
+            // Catch any IOExceptions and ignore them
+        }
+    }
+
     private static String rndAccNo() {
-    // It will generate 6 digit random Number.
-    // from 0 to 999999
-    Random rnd = new Random();
-    int number = rnd.nextInt(999999);
+        // It will generate 6 digit random Number.
+        // from 0 to 999999
+        Random rnd = new Random();
+        int number = rnd.nextInt(999999);
 
-    // this will convert any number sequence into 6 character.
-    return String.format("%06d", number);
-}
-    
+        // this will convert any number sequence into 6 character.
+        return String.format("%06d", number);
+    }
+
     public boolean containsOnlyLetters(String str) {
-  // Use the matches() method of the String class to check if the string
-  // matches the regular expression for alphabetical letters
-  return str.matches("[a-zA-Z\\s']+");
-}
+        // Use the matches() method of the String class to check if the string
+        // matches the regular expression for alphabetical letters
+        return str.matches("[a-zA-Z\\s']+");
+    }
+
     public boolean containsOnlyNumbers(String str) {
-  // Use the matches() method of the String class to check if the string
-  // matches the regular expression for integer numbers
-  return str.matches("\\d+");
-}
+        // Use the matches() method of the String class to check if the string
+        // matches the regular expression for integer numbers
+        return str.matches("\\d+");
+    }
 
-
-
-    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -213,54 +210,53 @@ public class RegisterMenu extends javax.swing.JFrame {
 
     private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
         // Create a LoginMenu object to access the isFourDigit function
-    LoginMenu l = new LoginMenu();
-    MainBankMenu mb = new MainBankMenu();
-    // Get the name, password, and age from the text fields
-    String name = this.registerName.getText().trim();
-    String password = this.registerPassword.getText().trim();
-    String ageStr = this.registerAge.getText().trim();
+        LoginMenu l = new LoginMenu();
+        MainBankMenu mb = new MainBankMenu();
+        // Get the name, password, and age from the text fields
+        String name = this.registerName.getText().trim();
+        String password = this.registerPassword.getText().trim();
+        String ageStr = this.registerAge.getText().trim();
 
-    // Check if any of the fields are empty
-    if (name.isEmpty() || password.isEmpty() || ageStr.isEmpty()) {
-        JOptionPane.showMessageDialog(null, "You have to fill all the details!");
-        return;
-    }
+        // Check if any of the fields are empty
+        if (name.isEmpty() || password.isEmpty() || ageStr.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "You have to fill all the details!");
+            return;
+        }
 
-    // Check if the password is 4 digits long and contains only digits
-    if (!l.isFourDigit(password)) {
-        JOptionPane.showMessageDialog(null, "Password must be 4 digits long and cannot contain any special characters!");
-        return;
-    }
+        // Check if the password is 4 digits long and contains only digits
+        if (!l.isFourDigit(password)) {
+            JOptionPane.showMessageDialog(null, "Password must be 4 digits long and cannot contain any special characters!");
+            return;
+        }
 
-    // Check if the name contains only letters
-    if (!containsOnlyLetters(name)) {
-        JOptionPane.showMessageDialog(null, "Your name must contain only alphabetical letters and cannot contain any special characters!");
-        return;
-    }
+        // Check if the name contains only letters
+        if (!containsOnlyLetters(name)) {
+            JOptionPane.showMessageDialog(null, "Your name must contain only alphabetical letters and cannot contain any special characters!");
+            return;
+        }
 
-    // Check if the age contains only digits
-    if (!containsOnlyNumbers(ageStr)) {
-        JOptionPane.showMessageDialog(null, "Your age must contain only integers!");
-        return;
-    }
+        // Check if the age contains only digits
+        if (!containsOnlyNumbers(ageStr)) {
+            JOptionPane.showMessageDialog(null, "Your age must contain only integers!");
+            return;
+        }
 
-    // If all the checks pass, create a BankDetails object with the entered data and add it to the bankDetailsList
-    int age = Integer.parseInt(ageStr);
-    String accNo = rndAccNo();
-    BankDetails bankDetails = new BankDetails(accNo, password, name, age);
-    Accounts mainAccount = new Accounts(accNo, 1, 0, "Main Account");
-    mb.accounts.add(mainAccount);
-    bankDetailsList.add(bankDetails);
+        // If all the checks pass, create a BankDetails object with the entered data and add it to the bankDetailsList
+        int age = Integer.parseInt(ageStr);
+        String accNo = rndAccNo();
+        BankDetails bankDetails = new BankDetails(accNo, password, name, age);
+        Accounts mainAccount = new Accounts(accNo, 1, 0, "Main Account");
+        mb.accounts.add(mainAccount);
+        bankDetailsList.add(bankDetails);
 
-    // Save the bankDetailsList to the BankDetails.dat file
-    saveBankDetailsToFile();
-    mb.saveAccountsFile();
+        // Save the bankDetailsList to the BankDetails.dat file
+        saveBankDetailsToFile();
+        mb.saveAccountsFile();
 
-    // Show a success message with the account number
-    JOptionPane.showMessageDialog(null, "Successfully Registered!\nHello " + name + " Your Account Number is " + accNo + "\nPlease remember your account number!");
+        // Show a success message with the account number
+        JOptionPane.showMessageDialog(null, "Successfully Registered!\nHello " + name + " Your Account Number is " + accNo + "\nPlease remember your account number!");
     }//GEN-LAST:event_registerButtonActionPerformed
-            
-    
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -274,13 +270,17 @@ public class RegisterMenu extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
+        }
+        catch (ClassNotFoundException ex) {
             java.util.logging.Logger.getLogger(RegisterMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
+        }
+        catch (InstantiationException ex) {
             java.util.logging.Logger.getLogger(RegisterMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
+        }
+        catch (IllegalAccessException ex) {
             java.util.logging.Logger.getLogger(RegisterMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        }
+        catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(RegisterMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
@@ -304,5 +304,4 @@ public class RegisterMenu extends javax.swing.JFrame {
     private javax.swing.JTextField registerName;
     private javax.swing.JPasswordField registerPassword;
     // End of variables declaration//GEN-END:variables
-    }
-
+}

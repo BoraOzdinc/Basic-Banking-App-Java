@@ -1,6 +1,5 @@
 package oopfinal;
 
-
 import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,12 +13,12 @@ import java.util.Calendar;
 import javax.swing.*;
 import javax.swing.event.*;
 
-
 /**
  *
  * @author borao
  */
 public class MainBankMenu extends javax.swing.JFrame {
+
     static RegisterMenu r = new RegisterMenu();
     static LoginMenu l = new LoginMenu();
     public String systemDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime());
@@ -27,40 +26,61 @@ public class MainBankMenu extends javax.swing.JFrame {
     public static int accNumberCounter = 1;
     public static int lastPage = 1;
     BankDetails bankDetails = r.bankDetailsList.get(userIndex);
-    
+
     ArrayList<Transactions> transactions;
-    
+
     ArrayList<Accounts> accounts;
-    
+
     String userAccNo = bankDetails.getAccNo();
-    
-    
+
     public MainBankMenu() {
         accounts = new ArrayList<Accounts>();
-        
+        transactions = new ArrayList<Transactions>();
+
         initComponents();
         r.populateBankDetailsList();
         populateAccounts();
+        populateTransactions();
         accountDashboard();
         lastPage(lastPage);
-        
+
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
-        
+
+        ArrayList<Transactions> userTransactions = transactionsByAccNo(transactions, userAccNo);
+
         String[] userAccountArray = new String[userAccounts.size()];
-        for (int i=0; i<userAccounts.size(); i++){
+        for (int i = 0; i < userAccounts.size(); i++) {
             userAccountArray[i] = userAccounts.get(i).getAccountName();
         }
         accFromComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
         accFromComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
         accToComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
-        
+
+        String[] userTransactionArray = new String[userTransactions.size()];
+        for (int i = 0; i < userTransactions.size(); i++) {
+
+            String senderName = r.bankDetailsList.get(findBankDetailsByAccNo(userTransactions.get(i).getSenderAccNo())).getName();
+            String receiverName = r.bankDetailsList.get(findBankDetailsByAccNo(userTransactions.get(i).getReceiverAccNo())).getName();
+
+            userTransactionArray[i] = senderName + "    " + "    " + "    " + "    "
+                    + receiverName + "    " + "    " + "    " + "    "
+                    + userTransactions.get(i).getTransactionDate() + "    " + "    " + "    " + "    "
+                    + userTransactions.get(i).getAmount() + "    " + "   " + "    " + "    "
+                    + userTransactions.get(i).getPaymentSource();
+        }
+
         transactionList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = userAccountArray;
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+            String[] strings = userTransactionArray;
+
+            public int getSize() {
+                return strings.length;
+            }
+
+            public String getElementAt(int i) {
+                return strings[i];
+            }
         });
-        
-        
+
         DocumentListener listener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -77,30 +97,31 @@ public class MainBankMenu extends javax.swing.JFrame {
                 updateLabel();
             }
         };
-        accNoInput.getDocument().addDocumentListener(listener);        
+        accNoInput.getDocument().addDocumentListener(listener);
     }
-    
+
     private void updateLabel() {
         // get the text from the text field
         String accNo = accNoInput.getText();
         int bankDetailsIndex = findBankDetailsByAccNo(accNo);
         try {
             int no = Integer.parseInt(accNo);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             accOwnerName.setText("You must enter a 6 digit account number.");
         }
-        if(bankDetailsIndex == -1){
+        if (bankDetailsIndex == -1) {
             accOwnerName.setText("This account cannot be found.");
         }
-        else if(bankDetails.getAccNo() == r.bankDetailsList.get(bankDetailsIndex).getName()){
+        else if (bankDetails.getAccNo() == r.bankDetailsList.get(bankDetailsIndex).getName()) {
             accOwnerName.setText("You cannot transfer to your own account!");
         }
-        else{
+        else {
             String name = r.bankDetailsList.get(bankDetailsIndex).getName();
             accOwnerName.setText(nameMask(name, 5));
         }
     }
-    
+
     public static String nameMask(String name, int numStars) {
         // split the name string into an array of words
         String[] words = name.split(" ");
@@ -125,8 +146,8 @@ public class MainBankMenu extends javax.swing.JFrame {
         // return the masked name
         return sb.toString().trim();
     }
-    
-    public void lastPage(int x){
+
+    public void lastPage(int x) {
         switch (x) {
             case 1 -> {
                 paymentsMenu.setVisible(false);
@@ -154,127 +175,136 @@ public class MainBankMenu extends javax.swing.JFrame {
                 accountsMenu.setVisible(false);
                 transactionMenu.setVisible(true);
             }
-            default -> throw new AssertionError();
+            default ->
+                throw new AssertionError();
         }
     }
-    
-    public void saveTransactionsFile(){
-    try{
-        // Create a FileOutputStream to write to the BankDetails.dat file
-        FileOutputStream file2 = new FileOutputStream("Transactions.dat");
-        // Create an ObjectOutputStream using the FileOutputStream
-        ObjectOutputStream outputFile2 = new ObjectOutputStream(file2);
-        
-        // Loop through the bankDetailsList and write each object to the ObjectOutputStream
-        for (int i = 0; i < transactions.size(); i++) {
-            outputFile2.writeObject(transactions.get(i));
-        }
-        // Close the ObjectOutputStream
-        outputFile2.close();
-    } catch(IOException e){
-        // Catch any IOExceptions and ignore them
-    }
-}
-    
-    public void saveAccountsFile(){
-    try{
-        // Create a FileOutputStream to write to the BankDetails.dat file
-        FileOutputStream file2 = new FileOutputStream("Accounts.dat");
-        // Create an ObjectOutputStream using the FileOutputStream
-        ObjectOutputStream outputFile2 = new ObjectOutputStream(file2);
-        
-        // Loop through the bankDetailsList and write each object to the ObjectOutputStream
-        for (int i = 0; i < accounts.size(); i++) {
-            outputFile2.writeObject(accounts.get(i));
-        }
-        // Close the ObjectOutputStream
-        outputFile2.close();
-    } catch(IOException e){
-        // Catch any IOExceptions and ignore them
-    }
-}
-    
-    public void populateTransactions(){
-    try{
-        // Create a FileInputStream to read from the BankDetails.dat file
-        FileInputStream file = new FileInputStream("Transactions.dat");
-        // Create an ObjectInputStream using the FileInputStream
-        ObjectInputStream inputFile = new ObjectInputStream(file);
-        
-        // Flag to indicate whether the end of the file has been reached
-        boolean endOfFile = false;
-        // Loop until the end of the file is reached
-        while (!endOfFile){
-            try{
-                // Read an object from the ObjectInputStream and add it to the bankDetailsList
-                transactions.add((Transactions) inputFile.readObject());
-            } catch(EOFException e){
-                // If an EOFException is thrown, set the endOfFile flag to true to exit the loop
-                endOfFile = true;
-            } catch(Exception f){
-                JOptionPane.showMessageDialog(null,f);
+
+    public void saveTransactionsFile() {
+        try {
+            // Create a FileOutputStream to write to the BankDetails.dat file
+            FileOutputStream file2 = new FileOutputStream("Transactions.dat");
+            // Create an ObjectOutputStream using the FileOutputStream
+            ObjectOutputStream outputFile2 = new ObjectOutputStream(file2);
+
+            // Loop through the bankDetailsList and write each object to the ObjectOutputStream
+            for (int i = 0; i < transactions.size(); i++) {
+                outputFile2.writeObject(transactions.get(i));
             }
+            // Close the ObjectOutputStream
+            outputFile2.close();
         }
-        // Close the ObjectInputStream
-        inputFile.close();
-    } catch(IOException e){
-        JOptionPane.showMessageDialog(null,e);
+        catch (IOException e) {
+            // Catch any IOExceptions and ignore them
+        }
     }
-}
-    
-    public void populateAccounts(){
-    try{
-        // Create a FileInputStream to read from the BankDetails.dat file
-        FileInputStream file = new FileInputStream("Accounts.dat");
-        // Create an ObjectInputStream using the FileInputStream
-        ObjectInputStream inputFile = new ObjectInputStream(file);
-        
-        // Flag to indicate whether the end of the file has been reached
-        boolean endOfFile = false;
-        // Loop until the end of the file is reached
-        while (!endOfFile){
-            try{
-                // Read an object from the ObjectInputStream and add it to the bankDetailsList
-                accounts.add((Accounts) inputFile.readObject());
-            } catch(EOFException e){
-                // If an EOFException is thrown, set the endOfFile flag to true to exit the loop
-                endOfFile = true;
-            } catch(Exception f){
-                JOptionPane.showMessageDialog(null,f);
+
+    public void saveAccountsFile() {
+        try {
+            // Create a FileOutputStream to write to the BankDetails.dat file
+            FileOutputStream file2 = new FileOutputStream("Accounts.dat");
+            // Create an ObjectOutputStream using the FileOutputStream
+            ObjectOutputStream outputFile2 = new ObjectOutputStream(file2);
+
+            // Loop through the bankDetailsList and write each object to the ObjectOutputStream
+            for (int i = 0; i < accounts.size(); i++) {
+                outputFile2.writeObject(accounts.get(i));
             }
+            // Close the ObjectOutputStream
+            outputFile2.close();
         }
-        // Close the ObjectInputStream
-        inputFile.close();
-    } catch(IOException e){
-        JOptionPane.showMessageDialog(null,e);
+        catch (IOException e) {
+            // Catch any IOExceptions and ignore them
+        }
     }
-}
-    
-    public void accountDashboard(){
+
+    public void populateTransactions() {
+        try {
+            // Create a FileInputStream to read from the BankDetails.dat file
+            FileInputStream file = new FileInputStream("Transactions.dat");
+            // Create an ObjectInputStream using the FileInputStream
+            ObjectInputStream inputFile = new ObjectInputStream(file);
+
+            // Flag to indicate whether the end of the file has been reached
+            boolean endOfFile = false;
+            // Loop until the end of the file is reached
+            while (!endOfFile) {
+                try {
+                    // Read an object from the ObjectInputStream and add it to the bankDetailsList
+                    transactions.add((Transactions) inputFile.readObject());
+                }
+                catch (EOFException e) {
+                    // If an EOFException is thrown, set the endOfFile flag to true to exit the loop
+                    endOfFile = true;
+                }
+                catch (Exception f) {
+                    JOptionPane.showMessageDialog(null, f);
+                }
+            }
+            // Close the ObjectInputStream
+            inputFile.close();
+        }
+        catch (IOException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    public void populateAccounts() {
+        try {
+            // Create a FileInputStream to read from the BankDetails.dat file
+            FileInputStream file = new FileInputStream("Accounts.dat");
+            // Create an ObjectInputStream using the FileInputStream
+            ObjectInputStream inputFile = new ObjectInputStream(file);
+
+            // Flag to indicate whether the end of the file has been reached
+            boolean endOfFile = false;
+            // Loop until the end of the file is reached
+            while (!endOfFile) {
+                try {
+                    // Read an object from the ObjectInputStream and add it to the bankDetailsList
+                    accounts.add((Accounts) inputFile.readObject());
+                }
+                catch (EOFException e) {
+                    // If an EOFException is thrown, set the endOfFile flag to true to exit the loop
+                    endOfFile = true;
+                }
+                catch (Exception f) {
+                    JOptionPane.showMessageDialog(null, f);
+                }
+            }
+            // Close the ObjectInputStream
+            inputFile.close();
+        }
+        catch (IOException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    public void accountDashboard() {
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
-        
+
         welcomeLabel.setText(bankDetails.getName());
-        
+
         double x = 0;
-        for(int i = 0 ; i < userAccounts.size() ; i++){
+        for (int i = 0; i < userAccounts.size(); i++) {
             x += userAccounts.get(i).getBalanceOfAccount();
         }
-        
+
         DecimalFormat df = new DecimalFormat("#.00");
         String s = df.format(x);
-        if(x == 0.0){
+        if (x == 0.0) {
             totalBalance.setText("$ 0.00");
         }
-        else{
-            totalBalance.setText("$ "+ s);
+        else {
+            totalBalance.setText("$ " + s);
         }
-        
-        if(userAccounts.size() == 0){
+
+        if (userAccounts.size() == 0) {
             dashboardAccounts.setVisible(false);
             dashboardAccounts1.setVisible(false);
-            
+
         }
-        else if(userAccounts.size() == 1){
+        else if (userAccounts.size() == 1) {
             dashboardAccounts.setVisible(true);
             accNo2.setVisible(false);
             accNo2Balance.setVisible(false);
@@ -285,7 +315,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             accNo4.setVisible(false);
             accNo4Balance.setVisible(false);
             accNo4Label.setVisible(false);
-            
+
             accNo6Balance.setVisible(false);
             accNo6.setVisible(false);
             accNo6Label.setVisible(false);
@@ -303,8 +333,8 @@ public class MainBankMenu extends javax.swing.JFrame {
             accNo5Label.setText(userAccounts.get(0).getAccountName());
             accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
         }
-        else if(userAccounts.size() == 2){
-            dashboardAccounts.setVisible(true);           
+        else if (userAccounts.size() == 2) {
+            dashboardAccounts.setVisible(true);
             accNo3.setVisible(false);
             accNo3Balance.setVisible(false);
             accNo3Label.setVisible(false);
@@ -328,8 +358,8 @@ public class MainBankMenu extends javax.swing.JFrame {
             accNo6Label.setText(userAccounts.get(1).getAccountName());
             accNo6Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
         }
-        else if(userAccounts.size() == 3){
-            dashboardAccounts.setVisible(true);           
+        else if (userAccounts.size() == 3) {
+            dashboardAccounts.setVisible(true);
             accNo4.setVisible(false);
             accNo4Balance.setVisible(false);
             accNo4Label.setVisible(false);
@@ -349,9 +379,9 @@ public class MainBankMenu extends javax.swing.JFrame {
             accNo6Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
             accNo7Label.setText(userAccounts.get(2).getAccountName());
             accNo7Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
-            
+
         }
-        else if(userAccounts.size() == 4){
+        else if (userAccounts.size() == 4) {
             dashboardAccounts.setVisible(true);
             dashboardAccounts1.setVisible(true);
             accNo1Label.setText(userAccounts.get(0).getAccountName());
@@ -372,8 +402,8 @@ public class MainBankMenu extends javax.swing.JFrame {
             accNo8Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(3).getBalanceOfAccount()));
         }
     }
-    
-    public static int findBankDetailsByAccNo( String str) {
+
+    public static int findBankDetailsByAccNo(String str) {
         // loop through the list
         for (int i = 0; i < r.bankDetailsList.size(); i++) {
             // get the current array
@@ -388,31 +418,46 @@ public class MainBankMenu extends javax.swing.JFrame {
         // if the search string was not found, return -1
         return -1;
     }
-    
-    /**
- * Finds all accounts in the given list that match the given account number.
- *
- * @param accounts the list of accounts to search
- * @param AccNo the account number to search for
- * @return a list of matching accounts
- */
-public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accounts, String AccNo) {
-    // create an empty list to store the matching accounts
-    ArrayList<Accounts> matchingAccounts = new ArrayList<>();
 
-    // iterate over the accounts in the list
-    for (Accounts account : accounts) {
-      // if the account number of the current account matches the search query, add it to the list of matching accounts
-      if (AccNo.equals(account.getAccNo())) {
-        matchingAccounts.add(account);
-      }
+    public static ArrayList<Transactions> transactionsByAccNo(ArrayList<Transactions> transactions, String AccNo) {
+        // create an empty list to store the matching accounts
+        ArrayList<Transactions> matchingAccounts = new ArrayList<>();
+
+        // iterate over the accounts in the list
+        for (Transactions transaction : transactions) {
+            // if the account number of the current account matches the search query, add it to the list of matching accounts
+            if (AccNo.equals(transaction.getSenderAccNo())) {
+                matchingAccounts.add(transaction);
+            }
+        }
+
+        // return the list of matching accounts
+        return matchingAccounts;
     }
 
-    // return the list of matching accounts
-    return matchingAccounts;
-  }
+    /**
+     * Finds all accounts in the given list that match the given account number.
+     *
+     * @param accounts the list of accounts to search
+     * @param AccNo    the account number to search for
+     * @return a list of matching accounts
+     */
+    public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accounts, String AccNo) {
+        // create an empty list to store the matching accounts
+        ArrayList<Accounts> matchingAccounts = new ArrayList<>();
 
-    
+        // iterate over the accounts in the list
+        for (Accounts account : accounts) {
+            // if the account number of the current account matches the search query, add it to the list of matching accounts
+            if (AccNo.equals(account.getAccNo())) {
+                matchingAccounts.add(account);
+            }
+        }
+
+        // return the list of matching accounts
+        return matchingAccounts;
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -481,6 +526,11 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
         transactionsPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         transactionList = new javax.swing.JList<>();
+        jLabel27 = new javax.swing.JLabel();
+        jLabel28 = new javax.swing.JLabel();
+        jLabel29 = new javax.swing.JLabel();
+        jLabel30 = new javax.swing.JLabel();
+        jLabel31 = new javax.swing.JLabel();
         paymentsMenu = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
         sendAccount = new javax.swing.JPanel();
@@ -1060,21 +1110,54 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
         transactionList.setToolTipText("");
         jScrollPane1.setViewportView(transactionList);
 
+        jLabel27.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+        jLabel27.setText("Sender");
+
+        jLabel28.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+        jLabel28.setText("Receivent");
+
+        jLabel29.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+        jLabel29.setText("Date and Time");
+
+        jLabel30.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+        jLabel30.setText("Amount");
+
+        jLabel31.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+        jLabel31.setText("Payment Source");
+
         javax.swing.GroupLayout transactionsPanelLayout = new javax.swing.GroupLayout(transactionsPanel);
         transactionsPanel.setLayout(transactionsPanelLayout);
         transactionsPanelLayout.setHorizontalGroup(
             transactionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(transactionsPanelLayout.createSequentialGroup()
                 .addGap(51, 51, 51)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 809, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(transactionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(transactionsPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel27)
+                        .addGap(91, 91, 91)
+                        .addComponent(jLabel28)
+                        .addGap(123, 123, 123)
+                        .addComponent(jLabel29)
+                        .addGap(106, 106, 106)
+                        .addComponent(jLabel30)
+                        .addGap(68, 68, 68)
+                        .addComponent(jLabel31))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 809, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         transactionsPanelLayout.setVerticalGroup(
             transactionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(transactionsPanelLayout.createSequentialGroup()
-                .addGap(44, 44, 44)
+                .addGap(22, 22, 22)
+                .addGroup(transactionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel27)
+                    .addComponent(jLabel28)
+                    .addComponent(jLabel29)
+                    .addComponent(jLabel30)
+                    .addComponent(jLabel31))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 454, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(55, Short.MAX_VALUE))
+                .addContainerGap(52, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout transactionMenuLayout = new javax.swing.GroupLayout(transactionMenu);
@@ -1396,9 +1479,9 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
     }// </editor-fold>//GEN-END:initComponents
 
     private void logoutButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_logoutButtonMouseClicked
-        int result = JOptionPane.showConfirmDialog(null,"Sure? You want to log out?", "Log Out?",
-               JOptionPane.YES_NO_OPTION);
-        if(result == 0){
+        int result = JOptionPane.showConfirmDialog(null, "Sure? You want to log out?", "Log Out?",
+                JOptionPane.YES_NO_OPTION);
+        if (result == 0) {
             lastPage = 1;
             this.dispose();
             new LoginMenu().setVisible(true);
@@ -1424,89 +1507,89 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
 
     private void createAccountButtonPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_createAccountButtonPanelMouseClicked
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
-        if (userAccounts.size() == 4){
-            JOptionPane.showMessageDialog(null,"You can't create more than 4 accounts!", "Warning!", JOptionPane.ERROR_MESSAGE);
+        if (userAccounts.size() == 4) {
+            JOptionPane.showMessageDialog(null, "You can't create more than 4 accounts!", "Warning!", JOptionPane.ERROR_MESSAGE);
         }
-        else{
+        else {
             String input = JOptionPane.showInputDialog("Please Enter Your Account Name.");
-            if(input.isEmpty()){
+            if (input.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "You have to enter a name to your account!");
             }
-            else{
-               Accounts newAccount = new Accounts(userAccNo, accNumberCounter, 0, input);
-               
+            else {
+                Accounts newAccount = new Accounts(userAccNo, accNumberCounter, 0, input);
+
                 accounts.add(newAccount);
-        
-                JOptionPane.showMessageDialog(null,"Your new account saved.");
+
+                JOptionPane.showMessageDialog(null, "Your new account saved.");
                 saveAccountsFile();
                 accNumberCounter++;
                 dispose();
-                new MainBankMenu().setVisible(true); 
-            }       
-        }      
+                new MainBankMenu().setVisible(true);
+            }
+        }
     }//GEN-LAST:event_createAccountButtonPanelMouseClicked
 
     private void accNo5TrashMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accNo5TrashMouseClicked
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
         int x = JOptionPane.showConfirmDialog(null,
-             "You are about to delete the account. Are you sure?", "Warning!", JOptionPane.YES_NO_OPTION);
-        if(x == 0){
+                "You are about to delete the account. Are you sure?", "Warning!", JOptionPane.YES_NO_OPTION);
+        if (x == 0) {
             Accounts accountToRemove = userAccounts.get(0);
             accounts.remove(accountToRemove);
-            
+
             saveAccountsFile();
             accNumberCounter--;
             dispose();
             new MainBankMenu().setVisible(true);
-            
+
         }
     }//GEN-LAST:event_accNo5TrashMouseClicked
 
     private void accNo6TrashMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accNo6TrashMouseClicked
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
         int x = JOptionPane.showConfirmDialog(null,
-             "You are about to delete the account. Are you sure?", "Warning!", JOptionPane.YES_NO_OPTION);
-        if(x == 0){
+                "You are about to delete the account. Are you sure?", "Warning!", JOptionPane.YES_NO_OPTION);
+        if (x == 0) {
             Accounts accountToRemove = userAccounts.get(1);
             accounts.remove(accountToRemove);
-            
+
             saveAccountsFile();
             accNumberCounter--;
             dispose();
             new MainBankMenu().setVisible(true);
-            
+
         }
     }//GEN-LAST:event_accNo6TrashMouseClicked
 
     private void accNo7TrashMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accNo7TrashMouseClicked
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
         int x = JOptionPane.showConfirmDialog(null,
-             "You are about to delete the account. Are you sure?", "Warning!", JOptionPane.YES_NO_OPTION);
-        if(x == 0){
+                "You are about to delete the account. Are you sure?", "Warning!", JOptionPane.YES_NO_OPTION);
+        if (x == 0) {
             Accounts accountToRemove = userAccounts.get(2);
             accounts.remove(accountToRemove);
-            
+
             saveAccountsFile();
             accNumberCounter--;
             dispose();
             new MainBankMenu().setVisible(true);
-            
+
         }
     }//GEN-LAST:event_accNo7TrashMouseClicked
 
     private void accNo8TrashMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accNo8TrashMouseClicked
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
         int x = JOptionPane.showConfirmDialog(null,
-             "You are about to delete the account. Are you sure?", "Warning!", JOptionPane.YES_NO_OPTION);
-        if(x == 0){
+                "You are about to delete the account. Are you sure?", "Warning!", JOptionPane.YES_NO_OPTION);
+        if (x == 0) {
             Accounts accountToRemove = userAccounts.get(3);
             accounts.remove(accountToRemove);
-            
+
             saveAccountsFile();
             accNumberCounter--;
             dispose();
             new MainBankMenu().setVisible(true);
-            
+
         }
     }//GEN-LAST:event_accNo8TrashMouseClicked
 
@@ -1530,36 +1613,36 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
         int senderAccIndex = accFromComboBox.getSelectedIndex();
         int receiverAccIndex = accToComboBox.getSelectedIndex();
         double senderBalance = userAccounts.get(senderAccIndex).getBalanceOfAccount();
-        double amountInput; 
-        
-        
-        if(senderAccIndex == receiverAccIndex){
-            JOptionPane.showMessageDialog(null, "You cannot transfer money to the same account!","Error!",JOptionPane.WARNING_MESSAGE);
+        double amountInput;
+
+        if (senderAccIndex == receiverAccIndex) {
+            JOptionPane.showMessageDialog(null, "You cannot transfer money to the same account!", "Error!", JOptionPane.WARNING_MESSAGE);
         }
-        else if(senderAccIndex == -1 || receiverAccIndex == -1){
+        else if (senderAccIndex == -1 || receiverAccIndex == -1) {
             int x = JOptionPane.showConfirmDialog(null, "You don't have any account.\nDo you want to open a new account?", "No Account!", JOptionPane.YES_NO_OPTION);
-            if(x == 0){
+            if (x == 0) {
                 accountsTabMouseClicked(evt);
                 createAccountButtonPanelMouseClicked(evt);
             }
         }
-        else{
+        else {
             try {
                 amountInput = Double.parseDouble(sendAccAmount.getText().trim());
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            if(amountInput > senderBalance){
+            if (amountInput > senderBalance) {
                 JOptionPane.showMessageDialog(null, "Insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
             }
-            else{
+            else {
                 Accounts senderAccount = userAccounts.get(senderAccIndex);
                 Accounts receiverAccount = userAccounts.get(receiverAccIndex);
-                
-                senderAccount.setBalanceOfAccount(senderAccount.getBalanceOfAccount()-amountInput);
-                receiverAccount.setBalanceOfAccount(receiverAccount.getBalanceOfAccount()+amountInput);
-                
+
+                senderAccount.setBalanceOfAccount(senderAccount.getBalanceOfAccount() - amountInput);
+                receiverAccount.setBalanceOfAccount(receiverAccount.getBalanceOfAccount() + amountInput);
+
                 accounts.set(accounts.indexOf(userAccounts.get(senderAccIndex)), senderAccount);
                 accounts.set(accounts.indexOf(userAccounts.get(receiverAccIndex)), receiverAccount);
                 saveAccountsFile();
@@ -1582,43 +1665,45 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
 
     private void confirmOtherAccButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_confirmOtherAccButtonMouseClicked
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
-        
+
         String receiventAccNo = accNoInput.getText().trim();
         int senderAccIndex = accFromComboBox1.getSelectedIndex();
         Accounts senderAcc = userAccounts.get(senderAccIndex);
         int bankDetailIndex = findBankDetailsByAccNo(receiventAccNo);
         double amountInput;
-        if(bankDetailIndex == -1){
+        if (bankDetailIndex == -1) {
             JOptionPane.showMessageDialog(null, "The account you are trying to send does not exist!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
-        else if(jTextField2.getText().isEmpty()){
+        else if (jTextField2.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
         try {
-                amountInput = Double.parseDouble(jTextField2.getText().trim());
-        } catch (Exception e) {
+            amountInput = Double.parseDouble(jTextField2.getText().trim());
+        }
+        catch (Exception e) {
             JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if(senderAcc.getBalanceOfAccount() < amountInput){
+        if (senderAcc.getBalanceOfAccount() < amountInput) {
             JOptionPane.showMessageDialog(null, "insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
-        else{
+        else {
             ArrayList<Accounts> receiventsAccounts = findAccountsByAccNo(accounts, receiventAccNo);
             Accounts senderAccount = userAccounts.get(senderAccIndex);
             Accounts receiverAccount = receiventsAccounts.get(0);
-            
+
             senderAccount.setBalanceOfAccount(senderAccount.getBalanceOfAccount() - amountInput);
             receiverAccount.setBalanceOfAccount(receiverAccount.getBalanceOfAccount() + amountInput);
-            
+
             accounts.set(accounts.indexOf(senderAccount), senderAccount);
             accounts.set(accounts.indexOf(receiverAccount), receiverAccount);
-            
-            Transactions newTransaction = new Transactions( userAccNo, receiventAccNo, systemDate, amountInput, senderAccount.getAccountName(), "");
-            
+
+            Transactions newTransaction = new Transactions(userAccNo, receiventAccNo, systemDate, amountInput, senderAccount.getAccountName());
+
             transactions.add(newTransaction);
+
             saveTransactionsFile();
-            
+
             saveAccountsFile();
             JOptionPane.showMessageDialog(null, "The transfer was successful!");
             dispose();
@@ -1627,7 +1712,7 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
     }//GEN-LAST:event_confirmOtherAccButtonMouseClicked
 
     private void accNoInputİnputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_accNoInputİnputMethodTextChanged
-        
+
     }//GEN-LAST:event_accNoInputİnputMethodTextChanged
 
     private void transactionsTabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_transactionsTabMouseClicked
@@ -1639,7 +1724,6 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
         transactionMenu.setVisible(true);
     }//GEN-LAST:event_transactionsTabMouseClicked
 
-   
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -1653,13 +1737,17 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
+        }
+        catch (ClassNotFoundException ex) {
             java.util.logging.Logger.getLogger(MainBankMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
+        }
+        catch (InstantiationException ex) {
             java.util.logging.Logger.getLogger(MainBankMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
+        }
+        catch (IllegalAccessException ex) {
             java.util.logging.Logger.getLogger(MainBankMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        }
+        catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(MainBankMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
@@ -1737,7 +1825,12 @@ public static ArrayList<Accounts> findAccountsByAccNo(ArrayList<Accounts> accoun
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel30;
+    private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
