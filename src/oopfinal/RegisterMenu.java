@@ -116,7 +116,7 @@ public class RegisterMenu extends javax.swing.JFrame {
         registerAge = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Abdülleziz Bank Register");
+        setTitle("Bank Register");
         setMaximumSize(new java.awt.Dimension(459, 442));
         setMinimumSize(new java.awt.Dimension(459, 442));
         setResizable(false);

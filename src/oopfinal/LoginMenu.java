@@ -93,7 +93,7 @@ public class LoginMenu extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Abdülleziz Bank");
+        setTitle("Bank");
         setBackground(new java.awt.Color(204, 204, 204));
         setFocusTraversalPolicyProvider(true);
         setMaximumSize(new java.awt.Dimension(291, 358));

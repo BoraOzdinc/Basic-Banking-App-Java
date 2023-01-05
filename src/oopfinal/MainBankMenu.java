@@ -23,7 +23,7 @@ public class MainBankMenu extends javax.swing.JFrame {
     static LoginMenu l = new LoginMenu();
     public String systemDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime());
     public static int userIndex;
-    public static int accNumberCounter = 1;
+    public static int accNumberCounter = 2;
     public static int lastPage = 1;
     BankDetails bankDetails = r.bankDetailsList.get(userIndex);
 
@@ -34,8 +34,8 @@ public class MainBankMenu extends javax.swing.JFrame {
     String userAccNo = bankDetails.getAccNo();
 
     public MainBankMenu() {
-        accounts = new ArrayList<Accounts>();
-        transactions = new ArrayList<Transactions>();
+        accounts = new ArrayList<>();
+        transactions = new ArrayList<>();
 
         initComponents();
         r.populateBankDetailsList();
@@ -55,32 +55,80 @@ public class MainBankMenu extends javax.swing.JFrame {
         accFromComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
         accFromComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
         accToComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
+        depositAccComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
+        withdrawAccComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
 
-        String[] userTransactionArray = new String[userTransactions.size()];
-        for (int i = 0; i < userTransactions.size(); i++) {
+        final String[] userTransactionSenderNameArray = userTransactionSenderNameConstructer(userTransactions);
+        final String[] userTransactionReceiventNameArray = userTransactionRecieventNameConstructer(userTransactions);
+        final String[] userTransactionDateArray = userTransactionDateConstructer(userTransactions);
+        final String[] userTransactionAmountArray = userTransactionAmountConstructer(userTransactions);
+        final String[] userTransactionSourceArray = userTransactionSourceConstructer(userTransactions);
 
-            String senderName = r.bankDetailsList.get(findBankDetailsByAccNo(userTransactions.get(i).getSenderAccNo())).getName();
-            String receiverName = r.bankDetailsList.get(findBankDetailsByAccNo(userTransactions.get(i).getReceiverAccNo())).getName();
+        SenderNameTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = userTransactionSenderNameArray;
 
-            userTransactionArray[i] = senderName + "    " + "    " + "    " + "    "
-                    + receiverName + "    " + "    " + "    " + "    "
-                    + userTransactions.get(i).getTransactionDate() + "    " + "    " + "    " + "    "
-                    + userTransactions.get(i).getAmount() + "    " + "   " + "    " + "    "
-                    + userTransactions.get(i).getPaymentSource();
-        }
-
-        transactionList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = userTransactionArray;
-
+            @Override
             public int getSize() {
                 return strings.length;
             }
 
+            @Override
             public String getElementAt(int i) {
                 return strings[i];
             }
         });
+        ReceiventNameTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = userTransactionReceiventNameArray;
 
+            @Override
+            public int getSize() {
+                return strings.length;
+            }
+
+            @Override
+            public String getElementAt(int i) {
+                return strings[i];
+            }
+        });
+        DateTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = userTransactionDateArray;
+
+            @Override
+            public int getSize() {
+                return strings.length;
+            }
+
+            @Override
+            public String getElementAt(int i) {
+                return strings[i];
+            }
+        });
+        AmountTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = userTransactionAmountArray;
+
+            @Override
+            public int getSize() {
+                return strings.length;
+            }
+
+            @Override
+            public String getElementAt(int i) {
+                return strings[i];
+            }
+        });
+        SourceTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = userTransactionSourceArray;
+
+            @Override
+            public int getSize() {
+                return strings.length;
+            }
+
+            @Override
+            public String getElementAt(int i) {
+                return strings[i];
+            }
+        });
         DocumentListener listener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -100,20 +148,91 @@ public class MainBankMenu extends javax.swing.JFrame {
         accNoInput.getDocument().addDocumentListener(listener);
     }
 
+    private String[] userTransactionSenderNameConstructer(ArrayList<Transactions> userTransactions) {
+        ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+        String[] userTransactionArray = new String[userTransactions.size()];
+        int selectedIndex = withdrawAccComboBox.getSelectedIndex();
+        Accounts depositedAcc = userAccounts.get(selectedIndex);
+        String receiverName;
+        for (int i = 0; i < userTransactions.size(); i++) {
+            if (findBankDetailsByAccNo(userTransactions.get(i).getSenderAccNo()) != -1) {
+                receiverName = r.bankDetailsList.get(findBankDetailsByAccNo(userTransactions.get(i).getSenderAccNo())).getName();
+            }
+            else {
+                receiverName = depositedAcc.getAccountName();
+            }
+
+            userTransactionArray[i] = receiverName;
+        }
+        return userTransactionArray;
+    }
+
+    private String[] userTransactionRecieventNameConstructer(ArrayList<Transactions> userTransactions) {
+        ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+        String[] userTransactionArray = new String[userTransactions.size()];
+        int selectedIndex = depositAccComboBox.getSelectedIndex();
+        Accounts depositedAcc = userAccounts.get(selectedIndex);
+        String receiverName;
+        for (int i = 0; i < userTransactions.size(); i++) {
+            if (findBankDetailsByAccNo(userTransactions.get(i).getReceiverAccNo()) != -1) {
+                receiverName = r.bankDetailsList.get(findBankDetailsByAccNo(userTransactions.get(i).getReceiverAccNo())).getName();
+            }
+            else {
+                receiverName = depositedAcc.getAccountName();
+            }
+
+            userTransactionArray[i] = receiverName;
+        }
+        return userTransactionArray;
+    }
+
+    public static String[] userTransactionDateConstructer(ArrayList<Transactions> userTransactions) {
+        String[] userTransactionArray = new String[userTransactions.size()];
+        for (int i = 0; i < userTransactions.size(); i++) {
+
+            String transactionDate = userTransactions.get(i).getTransactionDate();
+
+            userTransactionArray[i] = transactionDate;
+        }
+        return userTransactionArray;
+    }
+
+    public static String[] userTransactionAmountConstructer(ArrayList<Transactions> userTransactions) {
+        String[] userTransactionArray = new String[userTransactions.size()];
+        for (int i = 0; i < userTransactions.size(); i++) {
+
+            double amount = userTransactions.get(i).getAmount();
+
+            userTransactionArray[i] = String.valueOf(amount);
+        }
+        return userTransactionArray;
+    }
+
+    public static String[] userTransactionSourceConstructer(ArrayList<Transactions> userTransactions) {
+        String[] userTransactionArray = new String[userTransactions.size()];
+        for (int i = 0; i < userTransactions.size(); i++) {
+
+            String source = userTransactions.get(i).getPaymentSource();
+
+            userTransactionArray[i] = source;
+        }
+        return userTransactionArray;
+    }
+
     private void updateLabel() {
         // get the text from the text field
         String accNo = accNoInput.getText();
         int bankDetailsIndex = findBankDetailsByAccNo(accNo);
         try {
-            int no = Integer.parseInt(accNo);
+            Integer.parseInt(accNo);
         }
-        catch (Exception e) {
+        catch (NumberFormatException e) {
             accOwnerName.setText("You must enter a 6 digit account number.");
         }
         if (bankDetailsIndex == -1) {
             accOwnerName.setText("This account cannot be found.");
         }
-        else if (bankDetails.getAccNo() == r.bankDetailsList.get(bankDetailsIndex).getName()) {
+        else if (bankDetails.getAccNo().equals(r.bankDetailsList.get(bankDetailsIndex).getName())) {
             accOwnerName.setText("You cannot transfer to your own account!");
         }
         else {
@@ -147,7 +266,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         return sb.toString().trim();
     }
 
-    public void lastPage(int x) {
+    public final void lastPage(int x) {
         switch (x) {
             case 1 -> {
                 paymentsMenu.setVisible(false);
@@ -156,6 +275,8 @@ public class MainBankMenu extends javax.swing.JFrame {
                 sendAccPanel.setVisible(false);
                 sendOtherAccPanel.setVisible(false);
                 transactionMenu.setVisible(false);
+                depositPanel.setVisible(false);
+                withdrawPanel.setVisible(false);
             }
             case 2 -> {
                 paymentsMenu.setVisible(false);
@@ -218,7 +339,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
     }
 
-    public void populateTransactions() {
+    public final void populateTransactions() {
         try {
             // Create a FileInputStream to read from the BankDetails.dat file
             FileInputStream file = new FileInputStream("Transactions.dat");
@@ -249,7 +370,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
     }
 
-    public void populateAccounts() {
+    public final void populateAccounts() {
         try {
             // Create a FileInputStream to read from the BankDetails.dat file
             FileInputStream file = new FileInputStream("Accounts.dat");
@@ -280,7 +401,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
     }
 
-    public void accountDashboard() {
+    public final void accountDashboard() {
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
 
         welcomeLabel.setText(bankDetails.getName());
@@ -299,107 +420,108 @@ public class MainBankMenu extends javax.swing.JFrame {
             totalBalance.setText("$ " + s);
         }
 
-        if (userAccounts.size() == 0) {
-            dashboardAccounts.setVisible(false);
-            dashboardAccounts1.setVisible(false);
-
-        }
-        else if (userAccounts.size() == 1) {
-            dashboardAccounts.setVisible(true);
-            accNo2.setVisible(false);
-            accNo2Balance.setVisible(false);
-            accNo2Label.setVisible(false);
-            accNo3.setVisible(false);
-            accNo3Balance.setVisible(false);
-            accNo3Label.setVisible(false);
-            accNo4.setVisible(false);
-            accNo4Balance.setVisible(false);
-            accNo4Label.setVisible(false);
-
-            accNo6Balance.setVisible(false);
-            accNo6.setVisible(false);
-            accNo6Label.setVisible(false);
-            accNo6Trash.setVisible(false);
-            accNo7Balance.setVisible(false);
-            accNo7.setVisible(false);
-            accNo7Label.setVisible(false);
-            accNo7Trash.setVisible(false);
-            accNo8.setVisible(false);
-            accNo8Label.setVisible(false);
-            accNo8Balance.setVisible(false);
-            accNo8Trash.setVisible(false);
-            accNo1Label.setText(userAccounts.get(0).getAccountName());
-            accNo1Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
-            accNo5Label.setText(userAccounts.get(0).getAccountName());
-            accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
-        }
-        else if (userAccounts.size() == 2) {
-            dashboardAccounts.setVisible(true);
-            accNo3.setVisible(false);
-            accNo3Balance.setVisible(false);
-            accNo3Label.setVisible(false);
-            accNo4.setVisible(false);
-            accNo4Balance.setVisible(false);
-            accNo4Label.setVisible(false);
-            accNo7Balance.setVisible(false);
-            accNo7.setVisible(false);
-            accNo7Label.setVisible(false);
-            accNo7Trash.setVisible(false);
-            accNo8.setVisible(false);
-            accNo8Label.setVisible(false);
-            accNo8Balance.setVisible(false);
-            accNo8Trash.setVisible(false);
-            accNo1Label.setText(userAccounts.get(0).getAccountName());
-            accNo1Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
-            accNo2Label.setText(userAccounts.get(1).getAccountName());
-            accNo2Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
-            accNo5Label.setText(userAccounts.get(0).getAccountName());
-            accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
-            accNo6Label.setText(userAccounts.get(1).getAccountName());
-            accNo6Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
-        }
-        else if (userAccounts.size() == 3) {
-            dashboardAccounts.setVisible(true);
-            accNo4.setVisible(false);
-            accNo4Balance.setVisible(false);
-            accNo4Label.setVisible(false);
-            accNo8.setVisible(false);
-            accNo8Label.setVisible(false);
-            accNo8Balance.setVisible(false);
-            accNo8Trash.setVisible(false);
-            accNo1Label.setText(userAccounts.get(0).getAccountName());
-            accNo1Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
-            accNo2Label.setText(userAccounts.get(1).getAccountName());
-            accNo2Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
-            accNo3Label.setText(userAccounts.get(2).getAccountName());
-            accNo3Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
-            accNo5Label.setText(userAccounts.get(0).getAccountName());
-            accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
-            accNo6Label.setText(userAccounts.get(1).getAccountName());
-            accNo6Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
-            accNo7Label.setText(userAccounts.get(2).getAccountName());
-            accNo7Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
-
-        }
-        else if (userAccounts.size() == 4) {
-            dashboardAccounts.setVisible(true);
-            dashboardAccounts1.setVisible(true);
-            accNo1Label.setText(userAccounts.get(0).getAccountName());
-            accNo1Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
-            accNo2Label.setText(userAccounts.get(1).getAccountName());
-            accNo2Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
-            accNo3Label.setText(userAccounts.get(2).getAccountName());
-            accNo3Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
-            accNo4Label.setText(userAccounts.get(3).getAccountName());
-            accNo4Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(3).getBalanceOfAccount()));
-            accNo5Label.setText(userAccounts.get(0).getAccountName());
-            accNo5Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
-            accNo6Label.setText(userAccounts.get(1).getAccountName());
-            accNo6Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
-            accNo7Label.setText(userAccounts.get(2).getAccountName());
-            accNo7Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
-            accNo8Label.setText(userAccounts.get(3).getAccountName());
-            accNo8Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(3).getBalanceOfAccount()));
+        switch (userAccounts.size()) {
+            case 0:
+                dashboardAccounts.setVisible(false);
+                dashboardAccounts1.setVisible(false);
+                break;
+            case 1:
+                dashboardAccounts.setVisible(true);
+                accNo2.setVisible(false);
+                accNo2Balance.setVisible(false);
+                accNo2Label.setVisible(false);
+                accNo3.setVisible(false);
+                accNo3Balance.setVisible(false);
+                accNo3Label.setVisible(false);
+                accNo4.setVisible(false);
+                accNo4Balance.setVisible(false);
+                accNo4Label.setVisible(false);
+                accNo6Balance.setVisible(false);
+                accNo6.setVisible(false);
+                accNo6Label.setVisible(false);
+                accNo6Trash.setVisible(false);
+                accNo7Balance.setVisible(false);
+                accNo7.setVisible(false);
+                accNo7Label.setVisible(false);
+                accNo7Trash.setVisible(false);
+                accNo8.setVisible(false);
+                accNo8Label.setVisible(false);
+                accNo8Balance.setVisible(false);
+                accNo8Trash.setVisible(false);
+                accNo1Label.setText(userAccounts.get(0).getAccountName());
+                accNo1Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo5Label.setText(userAccounts.get(0).getAccountName());
+                accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                break;
+            case 2:
+                dashboardAccounts.setVisible(true);
+                accNo3.setVisible(false);
+                accNo3Balance.setVisible(false);
+                accNo3Label.setVisible(false);
+                accNo4.setVisible(false);
+                accNo4Balance.setVisible(false);
+                accNo4Label.setVisible(false);
+                accNo7Balance.setVisible(false);
+                accNo7.setVisible(false);
+                accNo7Label.setVisible(false);
+                accNo7Trash.setVisible(false);
+                accNo8.setVisible(false);
+                accNo8Label.setVisible(false);
+                accNo8Balance.setVisible(false);
+                accNo8Trash.setVisible(false);
+                accNo1Label.setText(userAccounts.get(0).getAccountName());
+                accNo1Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo2Label.setText(userAccounts.get(1).getAccountName());
+                accNo2Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+                accNo5Label.setText(userAccounts.get(0).getAccountName());
+                accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo6Label.setText(userAccounts.get(1).getAccountName());
+                accNo6Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+                break;
+            case 3:
+                dashboardAccounts.setVisible(true);
+                accNo4.setVisible(false);
+                accNo4Balance.setVisible(false);
+                accNo4Label.setVisible(false);
+                accNo8.setVisible(false);
+                accNo8Label.setVisible(false);
+                accNo8Balance.setVisible(false);
+                accNo8Trash.setVisible(false);
+                accNo1Label.setText(userAccounts.get(0).getAccountName());
+                accNo1Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo2Label.setText(userAccounts.get(1).getAccountName());
+                accNo2Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+                accNo3Label.setText(userAccounts.get(2).getAccountName());
+                accNo3Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+                accNo5Label.setText(userAccounts.get(0).getAccountName());
+                accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo6Label.setText(userAccounts.get(1).getAccountName());
+                accNo6Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+                accNo7Label.setText(userAccounts.get(2).getAccountName());
+                accNo7Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+                break;
+            case 4:
+                dashboardAccounts.setVisible(true);
+                dashboardAccounts1.setVisible(true);
+                accNo1Label.setText(userAccounts.get(0).getAccountName());
+                accNo1Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo2Label.setText(userAccounts.get(1).getAccountName());
+                accNo2Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+                accNo3Label.setText(userAccounts.get(2).getAccountName());
+                accNo3Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+                accNo4Label.setText(userAccounts.get(3).getAccountName());
+                accNo4Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(3).getBalanceOfAccount()));
+                accNo5Label.setText(userAccounts.get(0).getAccountName());
+                accNo5Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo6Label.setText(userAccounts.get(1).getAccountName());
+                accNo6Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+                accNo7Label.setText(userAccounts.get(2).getAccountName());
+                accNo7Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+                accNo8Label.setText(userAccounts.get(3).getAccountName());
+                accNo8Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(3).getBalanceOfAccount()));
+                break;
+            default:
+                break;
         }
     }
 
@@ -419,6 +541,13 @@ public class MainBankMenu extends javax.swing.JFrame {
         return -1;
     }
 
+    /**
+     * Finds all accounts in the given list that match the given account number.
+     *
+     * @param transactions the list of accounts to search
+     * @param AccNo        the account number to search for
+     * @return a list of matching accounts
+     */
     public static ArrayList<Transactions> transactionsByAccNo(ArrayList<Transactions> transactions, String AccNo) {
         // create an empty list to store the matching accounts
         ArrayList<Transactions> matchingAccounts = new ArrayList<>();
@@ -479,7 +608,6 @@ public class MainBankMenu extends javax.swing.JFrame {
         dashboardMenu = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         totalBalance = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         dashboardAccounts = new javax.swing.JPanel();
         accNo3 = new javax.swing.JLabel();
@@ -524,13 +652,35 @@ public class MainBankMenu extends javax.swing.JFrame {
         withdrawButton = new javax.swing.JPanel();
         jLabel26 = new javax.swing.JLabel();
         transactionsPanel = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        SourceTransactionList = new javax.swing.JList<>();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        AmountTransactionList = new javax.swing.JList<>();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        DateTransactionList = new javax.swing.JList<>();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        ReceiventNameTransactionList = new javax.swing.JList<>();
         jScrollPane1 = new javax.swing.JScrollPane();
-        transactionList = new javax.swing.JList<>();
+        SenderNameTransactionList = new javax.swing.JList<>();
         jLabel27 = new javax.swing.JLabel();
         jLabel28 = new javax.swing.JLabel();
         jLabel29 = new javax.swing.JLabel();
         jLabel30 = new javax.swing.JLabel();
         jLabel31 = new javax.swing.JLabel();
+        depositPanel = new javax.swing.JPanel();
+        depositAccComboBox = new javax.swing.JComboBox<>();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        depositAccButton = new javax.swing.JPanel();
+        jLabel32 = new javax.swing.JLabel();
+        jLabel33 = new javax.swing.JLabel();
+        withdrawPanel = new javax.swing.JPanel();
+        withdrawAccComboBox = new javax.swing.JComboBox<>();
+        jTextField3 = new javax.swing.JTextField();
+        jLabel16 = new javax.swing.JLabel();
+        withdrawAccButton = new javax.swing.JPanel();
+        jLabel34 = new javax.swing.JLabel();
+        jLabel35 = new javax.swing.JLabel();
         paymentsMenu = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
         sendAccount = new javax.swing.JPanel();
@@ -554,11 +704,12 @@ public class MainBankMenu extends javax.swing.JFrame {
         accToComboBox = new javax.swing.JComboBox<>();
         jLabel17 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
+        switchButton = new javax.swing.JLabel();
         sendAccAmount = new javax.swing.JTextField();
         jLabel19 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Main Bank Menu");
         setMaximumSize(new java.awt.Dimension(1200, 695));
         setMinimumSize(new java.awt.Dimension(1200, 695));
         setResizable(false);
@@ -741,7 +892,7 @@ public class MainBankMenu extends javax.swing.JFrame {
                 .addComponent(welcomeLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(welcomeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(dashboardTab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(accountsTab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -755,22 +906,20 @@ public class MainBankMenu extends javax.swing.JFrame {
         );
 
         Menus.setBackground(new java.awt.Color(232, 232, 232));
-        Menus.setLayout(null);
+        Menus.setLayout(new javax.swing.OverlayLayout(Menus));
 
         dashboardMenu.setBackground(new java.awt.Color(232, 232, 232));
         dashboardMenu.setMaximumSize(new java.awt.Dimension(994, 695));
         dashboardMenu.setMinimumSize(new java.awt.Dimension(994, 695));
+        dashboardMenu.setName(""); // NOI18N
 
-        jLabel7.setFont(new java.awt.Font("Poppins", 1, 18)); // NOI18N
+        jLabel7.setFont(new java.awt.Font("Poppins", 1, 24)); // NOI18N
         jLabel7.setText("Total Balance");
 
         totalBalance.setFont(new java.awt.Font("Poppins", 0, 24)); // NOI18N
         totalBalance.setText("$ 999,999,999.99");
 
-        jLabel9.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
-        jLabel9.setText("Recent Transactions");
-
-        jLabel10.setFont(new java.awt.Font("Poppins", 1, 18)); // NOI18N
+        jLabel10.setFont(new java.awt.Font("Poppins", 1, 24)); // NOI18N
         jLabel10.setText("Accounts");
 
         dashboardAccounts.setBackground(new java.awt.Color(232, 232, 232));
@@ -843,34 +992,27 @@ public class MainBankMenu extends javax.swing.JFrame {
             .addGroup(dashboardMenuLayout.createSequentialGroup()
                 .addGap(22, 22, 22)
                 .addGroup(dashboardMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(totalBalance)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel9))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
-                .addGroup(dashboardMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(dashboardAccounts, javax.swing.GroupLayout.PREFERRED_SIZE, 591, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(119, 119, 119))
+                    .addComponent(totalBalance)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel10))
+                .addContainerGap(381, Short.MAX_VALUE))
         );
         dashboardMenuLayout.setVerticalGroup(
             dashboardMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dashboardMenuLayout.createSequentialGroup()
-                .addGap(106, 106, 106)
-                .addGroup(dashboardMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel10))
+                .addGap(25, 25, 25)
+                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(dashboardMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(dashboardMenuLayout.createSequentialGroup()
-                        .addComponent(totalBalance)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel9))
-                    .addComponent(dashboardAccounts, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(98, Short.MAX_VALUE))
+                .addComponent(totalBalance)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(dashboardAccounts, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(79, Short.MAX_VALUE))
         );
 
         Menus.add(dashboardMenu);
-        dashboardMenu.setBounds(0, 0, 994, 695);
 
         accountsMenu.setBackground(new java.awt.Color(232, 232, 232));
         accountsMenu.setForeground(new java.awt.Color(102, 102, 102));
@@ -1025,13 +1167,25 @@ public class MainBankMenu extends javax.swing.JFrame {
         createAccountButtonPanel.setBounds(310, 570, 400, 80);
 
         Menus.add(accountsMenu);
-        accountsMenu.setBounds(-2, -3, 1140, 700);
 
         transactionMenu.setBackground(new java.awt.Color(232, 232, 232));
+        transactionMenu.setMaximumSize(new java.awt.Dimension(994, 695));
+        transactionMenu.setMinimumSize(new java.awt.Dimension(994, 695));
+        transactionMenu.setPreferredSize(new java.awt.Dimension(994, 695));
+        transactionMenu.setLayout(null);
 
         jLabel20.setFont(new java.awt.Font("Poppins", 1, 36)); // NOI18N
         jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel20.setText("TRANSACTIONS");
+        transactionMenu.add(jLabel20);
+        jLabel20.setBounds(6, 24, 907, 55);
+
+        transactionHistoryButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        transactionHistoryButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                transactionHistoryButtonMouseClicked(evt);
+            }
+        });
 
         jLabel5.setFont(new java.awt.Font("Poppins", 1, 14)); // NOI18N
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -1050,9 +1204,19 @@ public class MainBankMenu extends javax.swing.JFrame {
             transactionHistoryButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(transactionHistoryButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
                 .addContainerGap())
         );
+
+        transactionMenu.add(transactionHistoryButton);
+        transactionHistoryButton.setBounds(120, 80, 150, 50);
+
+        depositButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        depositButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                depositButtonMouseClicked(evt);
+            }
+        });
 
         jLabel25.setFont(new java.awt.Font("Poppins", 1, 14)); // NOI18N
         jLabel25.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -1075,9 +1239,19 @@ public class MainBankMenu extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        transactionMenu.add(depositButton);
+        depositButton.setBounds(390, 80, 150, 50);
+
+        withdrawButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
         jLabel26.setFont(new java.awt.Font("Poppins", 1, 14)); // NOI18N
         jLabel26.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel26.setText("Withdraw");
+        jLabel26.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel26MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout withdrawButtonLayout = new javax.swing.GroupLayout(withdrawButton);
         withdrawButton.setLayout(withdrawButtonLayout);
@@ -1092,37 +1266,97 @@ public class MainBankMenu extends javax.swing.JFrame {
             withdrawButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(withdrawButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel26, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel26, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
+        transactionMenu.add(withdrawButton);
+        withdrawButton.setBounds(660, 80, 150, 50);
+
         transactionsPanel.setBackground(new java.awt.Color(232, 232, 232));
 
-        jScrollPane1.setBackground(new java.awt.Color(232, 232, 232));
+        jScrollPane5.setBackground(new java.awt.Color(232, 232, 232));
+        jScrollPane5.setBorder(null);
 
-        transactionList.setBackground(new java.awt.Color(232, 232, 232));
-        transactionList.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        transactionList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "No Transactions!" };
+        SourceTransactionList.setBackground(new java.awt.Color(232, 232, 232));
+        SourceTransactionList.setBorder(null);
+        SourceTransactionList.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        SourceTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Main Account" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        transactionList.setToolTipText("");
-        jScrollPane1.setViewportView(transactionList);
+        SourceTransactionList.setToolTipText("");
+        jScrollPane5.setViewportView(SourceTransactionList);
 
-        jLabel27.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+        jScrollPane4.setBackground(new java.awt.Color(232, 232, 232));
+        jScrollPane4.setBorder(null);
+
+        AmountTransactionList.setBackground(new java.awt.Color(232, 232, 232));
+        AmountTransactionList.setBorder(null);
+        AmountTransactionList.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        AmountTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "999999.99" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        AmountTransactionList.setToolTipText("");
+        jScrollPane4.setViewportView(AmountTransactionList);
+
+        jScrollPane3.setBackground(new java.awt.Color(232, 232, 232));
+        jScrollPane3.setBorder(null);
+
+        DateTransactionList.setBackground(new java.awt.Color(232, 232, 232));
+        DateTransactionList.setBorder(null);
+        DateTransactionList.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        DateTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "31/12/2023 24:60" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        DateTransactionList.setToolTipText("");
+        jScrollPane3.setViewportView(DateTransactionList);
+
+        jScrollPane2.setBackground(new java.awt.Color(232, 232, 232));
+        jScrollPane2.setBorder(null);
+
+        ReceiventNameTransactionList.setBackground(new java.awt.Color(232, 232, 232));
+        ReceiventNameTransactionList.setBorder(null);
+        ReceiventNameTransactionList.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        ReceiventNameTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Bora Kaan Ozdinc" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        ReceiventNameTransactionList.setToolTipText("");
+        jScrollPane2.setViewportView(ReceiventNameTransactionList);
+
+        jScrollPane1.setBackground(new java.awt.Color(232, 232, 232));
+        jScrollPane1.setBorder(null);
+
+        SenderNameTransactionList.setBackground(new java.awt.Color(232, 232, 232));
+        SenderNameTransactionList.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        SenderNameTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Bora Kaan Ozdinc" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        SenderNameTransactionList.setToolTipText("");
+        jScrollPane1.setViewportView(SenderNameTransactionList);
+
+        jLabel27.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel27.setText("Sender");
 
-        jLabel28.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+        jLabel28.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel28.setText("Receivent");
 
-        jLabel29.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+        jLabel29.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel29.setText("Date and Time");
 
-        jLabel30.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+        jLabel30.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel30.setText("Amount");
 
-        jLabel31.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+        jLabel31.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel31.setText("Payment Source");
 
         javax.swing.GroupLayout transactionsPanelLayout = new javax.swing.GroupLayout(transactionsPanel);
@@ -1130,20 +1364,34 @@ public class MainBankMenu extends javax.swing.JFrame {
         transactionsPanelLayout.setHorizontalGroup(
             transactionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(transactionsPanelLayout.createSequentialGroup()
-                .addGap(51, 51, 51)
-                .addGroup(transactionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(44, 44, 44)
+                .addGroup(transactionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(transactionsPanelLayout.createSequentialGroup()
                         .addComponent(jLabel27)
-                        .addGap(91, 91, 91)
-                        .addComponent(jLabel28)
                         .addGap(123, 123, 123)
+                        .addComponent(jLabel28)
+                        .addGap(72, 72, 72)
                         .addComponent(jLabel29)
-                        .addGap(106, 106, 106)
+                        .addGap(32, 32, 32))
+                    .addGroup(transactionsPanelLayout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(27, 27, 27)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(9, 9, 9)))
+                .addGroup(transactionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(transactionsPanelLayout.createSequentialGroup()
+                        .addGap(60, 60, 60)
                         .addComponent(jLabel30)
-                        .addGap(68, 68, 68)
+                        .addGap(79, 79, 79)
                         .addComponent(jLabel31))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 809, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(transactionsPanelLayout.createSequentialGroup()
+                        .addGap(27, 27, 27)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(34, 34, 34)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(143, Short.MAX_VALUE))
         );
         transactionsPanelLayout.setVerticalGroup(
             transactionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1156,44 +1404,179 @@ public class MainBankMenu extends javax.swing.JFrame {
                     .addComponent(jLabel30)
                     .addComponent(jLabel31))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 454, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(52, Short.MAX_VALUE))
+                .addGroup(transactionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane5)
+                    .addComponent(jScrollPane2)
+                    .addComponent(jScrollPane1))
+                .addContainerGap())
         );
 
-        javax.swing.GroupLayout transactionMenuLayout = new javax.swing.GroupLayout(transactionMenu);
-        transactionMenu.setLayout(transactionMenuLayout);
-        transactionMenuLayout.setHorizontalGroup(
-            transactionMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(transactionMenuLayout.createSequentialGroup()
-                .addGap(57, 57, 57)
-                .addComponent(transactionHistoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(165, 165, 165)
-                .addComponent(depositButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(withdrawButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(89, 89, 89))
-            .addGroup(transactionMenuLayout.createSequentialGroup()
+        transactionMenu.add(transactionsPanel);
+        transactionsPanel.setBounds(0, 147, 1002, 548);
+
+        depositPanel.setBackground(new java.awt.Color(232, 232, 232));
+
+        depositAccComboBox.setFont(new java.awt.Font("Poppins", 0, 18)); // NOI18N
+        depositAccComboBox.setMaximumRowCount(4);
+
+        jTextField1.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+
+        jLabel9.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel9.setText("Amount");
+
+        depositAccButton.setForeground(new java.awt.Color(60, 63, 65));
+        depositAccButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        depositAccButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                depositAccButtonMouseClicked(evt);
+            }
+        });
+
+        jLabel32.setFont(new java.awt.Font("Poppins", 1, 18)); // NOI18N
+        jLabel32.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel32.setText("Deposit");
+
+        javax.swing.GroupLayout depositAccButtonLayout = new javax.swing.GroupLayout(depositAccButton);
+        depositAccButton.setLayout(depositAccButtonLayout);
+        depositAccButtonLayout.setHorizontalGroup(
+            depositAccButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(depositAccButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 907, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
-            .addComponent(transactionsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel32, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
-        transactionMenuLayout.setVerticalGroup(
-            transactionMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(transactionMenuLayout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addComponent(jLabel20)
+        depositAccButtonLayout.setVerticalGroup(
+            depositAccButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(depositAccButtonLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel32, javax.swing.GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jLabel33.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel33.setText("Select Account to Deposit");
+
+        javax.swing.GroupLayout depositPanelLayout = new javax.swing.GroupLayout(depositPanel);
+        depositPanel.setLayout(depositPanelLayout);
+        depositPanelLayout.setHorizontalGroup(
+            depositPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(depositPanelLayout.createSequentialGroup()
+                .addGap(359, 359, 359)
+                .addGroup(depositPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, depositPanelLayout.createSequentialGroup()
+                        .addGroup(depositPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(depositAccButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jTextField1)
+                            .addComponent(depositAccComboBox, 0, 246, Short.MAX_VALUE))
+                        .addGap(397, 397, 397))
+                    .addGroup(depositPanelLayout.createSequentialGroup()
+                        .addGroup(depositPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel33))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+        );
+        depositPanelLayout.setVerticalGroup(
+            depositPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(depositPanelLayout.createSequentialGroup()
+                .addGap(50, 50, 50)
+                .addComponent(jLabel33)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(transactionMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(transactionHistoryButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(depositButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(withdrawButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(transactionsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(depositAccComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(35, 35, 35)
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(52, 52, 52)
+                .addComponent(depositAccButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(204, Short.MAX_VALUE))
         );
+
+        transactionMenu.add(depositPanel);
+        depositPanel.setBounds(0, 147, 1002, 548);
+
+        withdrawPanel.setBackground(new java.awt.Color(232, 232, 232));
+
+        withdrawAccComboBox.setFont(new java.awt.Font("Poppins", 0, 18)); // NOI18N
+        withdrawAccComboBox.setMaximumRowCount(4);
+
+        jTextField3.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+
+        jLabel16.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel16.setText("Amount");
+
+        withdrawAccButton.setForeground(new java.awt.Color(60, 63, 65));
+        withdrawAccButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        withdrawAccButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                withdrawAccButtonMouseClicked(evt);
+            }
+        });
+
+        jLabel34.setFont(new java.awt.Font("Poppins", 1, 18)); // NOI18N
+        jLabel34.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel34.setText("Withdraw");
+
+        javax.swing.GroupLayout withdrawAccButtonLayout = new javax.swing.GroupLayout(withdrawAccButton);
+        withdrawAccButton.setLayout(withdrawAccButtonLayout);
+        withdrawAccButtonLayout.setHorizontalGroup(
+            withdrawAccButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(withdrawAccButtonLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel34, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        withdrawAccButtonLayout.setVerticalGroup(
+            withdrawAccButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(withdrawAccButtonLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel34, javax.swing.GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jLabel35.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel35.setText("Select Account to Withdraw");
+
+        javax.swing.GroupLayout withdrawPanelLayout = new javax.swing.GroupLayout(withdrawPanel);
+        withdrawPanel.setLayout(withdrawPanelLayout);
+        withdrawPanelLayout.setHorizontalGroup(
+            withdrawPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(withdrawPanelLayout.createSequentialGroup()
+                .addGap(359, 359, 359)
+                .addGroup(withdrawPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, withdrawPanelLayout.createSequentialGroup()
+                        .addGroup(withdrawPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(withdrawAccButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jTextField3)
+                            .addComponent(withdrawAccComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(397, 397, 397))
+                    .addGroup(withdrawPanelLayout.createSequentialGroup()
+                        .addGroup(withdrawPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel35))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+        );
+        withdrawPanelLayout.setVerticalGroup(
+            withdrawPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(withdrawPanelLayout.createSequentialGroup()
+                .addGap(50, 50, 50)
+                .addComponent(jLabel35)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(withdrawAccComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(35, 35, 35)
+                .addComponent(jLabel16)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(52, 52, 52)
+                .addComponent(withdrawAccButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(204, Short.MAX_VALUE))
+        );
+
+        transactionMenu.add(withdrawPanel);
+        withdrawPanel.setBounds(0, 147, 1002, 548);
 
         Menus.add(transactionMenu);
-        transactionMenu.setBounds(0, 0, 940, 700);
 
         paymentsMenu.setBackground(new java.awt.Color(232, 232, 232));
         paymentsMenu.setForeground(new java.awt.Color(51, 51, 51));
@@ -1208,6 +1591,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         paymentsMenu.add(jLabel12);
         jLabel12.setBounds(0, 30, 937, 55);
 
+        sendAccount.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
         sendAccount.setForeground(new java.awt.Color(51, 51, 51));
         sendAccount.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         sendAccount.setMaximumSize(new java.awt.Dimension(210, 60));
@@ -1227,22 +1611,17 @@ public class MainBankMenu extends javax.swing.JFrame {
         sendAccount.setLayout(sendAccountLayout);
         sendAccountLayout.setHorizontalGroup(
             sendAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(sendAccountLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
         );
         sendAccountLayout.setVerticalGroup(
             sendAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(sendAccountLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
         );
 
         paymentsMenu.add(sendAccount);
         sendAccount.setBounds(116, 92, 210, 60);
 
+        sendPerson.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
         sendPerson.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         sendPerson.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1259,17 +1638,11 @@ public class MainBankMenu extends javax.swing.JFrame {
         sendPerson.setLayout(sendPersonLayout);
         sendPersonLayout.setHorizontalGroup(
             sendPersonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(sendPersonLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jLabel14, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
         );
         sendPersonLayout.setVerticalGroup(
             sendPersonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(sendPersonLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
         );
 
         paymentsMenu.add(sendPerson);
@@ -1434,15 +1807,15 @@ public class MainBankMenu extends javax.swing.JFrame {
         sendAccPanel.add(jLabel18);
         jLabel18.setBounds(340, 290, 60, 22);
 
-        jLabel16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/switch_icon.png"))); // NOI18N
-        jLabel16.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jLabel16.addMouseListener(new java.awt.event.MouseAdapter() {
+        switchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/oopfinal/switch_icon.png"))); // NOI18N
+        switchButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        switchButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel16MouseClicked(evt);
+                switchButtonMouseClicked(evt);
             }
         });
-        sendAccPanel.add(jLabel16);
-        jLabel16.setBounds(430, 140, 48, 48);
+        sendAccPanel.add(switchButton);
+        switchButton.setBounds(430, 140, 48, 48);
 
         sendAccAmount.setFont(new java.awt.Font("Poppins", 0, 18)); // NOI18N
         sendAccPanel.add(sendAccAmount);
@@ -1457,7 +1830,6 @@ public class MainBankMenu extends javax.swing.JFrame {
         sendAccPanel.setBounds(0, 164, 994, 531);
 
         Menus.add(paymentsMenu);
-        paymentsMenu.setBounds(0, 0, 930, 690);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -1466,7 +1838,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(TabMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Menus, javax.swing.GroupLayout.DEFAULT_SIZE, 934, Short.MAX_VALUE))
+                .addComponent(Menus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1601,12 +1973,12 @@ public class MainBankMenu extends javax.swing.JFrame {
         transactionMenu.setVisible(false);
     }//GEN-LAST:event_paymentsTabMouseClicked
 
-    private void jLabel16MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel16MouseClicked
+    private void switchButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_switchButtonMouseClicked
         int senderAccIndex = accFromComboBox.getSelectedIndex();
         int receverAccIndex = accToComboBox.getSelectedIndex();
         accFromComboBox.setSelectedIndex(receverAccIndex);
         accToComboBox.setSelectedIndex(senderAccIndex);
-    }//GEN-LAST:event_jLabel16MouseClicked
+    }//GEN-LAST:event_switchButtonMouseClicked
 
     private void confirmAccButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_confirmAccButtonMouseClicked
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
@@ -1724,6 +2096,84 @@ public class MainBankMenu extends javax.swing.JFrame {
         transactionMenu.setVisible(true);
     }//GEN-LAST:event_transactionsTabMouseClicked
 
+    private void depositButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_depositButtonMouseClicked
+        transactionsPanel.setVisible(false);
+        depositPanel.setVisible(true);
+        withdrawPanel.setVisible(false);
+    }//GEN-LAST:event_depositButtonMouseClicked
+
+    private void transactionHistoryButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_transactionHistoryButtonMouseClicked
+        transactionsPanel.setVisible(true);
+        depositPanel.setVisible(false);
+        withdrawPanel.setVisible(false);
+    }//GEN-LAST:event_transactionHistoryButtonMouseClicked
+
+    private void depositAccButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_depositAccButtonMouseClicked
+        ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+        double amountInput;
+        int selectedIndex = depositAccComboBox.getSelectedIndex();
+        if (jTextField1.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
+        }
+        try {
+            amountInput = Double.parseDouble(jTextField1.getText().trim());
+        }
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Accounts depositedAcc = userAccounts.get(selectedIndex);
+        depositedAcc.setBalanceOfAccount(depositedAcc.getBalanceOfAccount() + amountInput);
+
+        accounts.set(accounts.indexOf(depositedAcc), depositedAcc);
+
+        Transactions newTransaction = new Transactions(userAccNo, depositedAcc.getAccountName(), systemDate, amountInput, "Deposit!");
+        transactions.add(newTransaction);
+
+        saveTransactionsFile();
+        saveAccountsFile();
+        JOptionPane.showMessageDialog(null, "The deposit was successful!");
+        dispose();
+        new MainBankMenu().setVisible(true);
+    }//GEN-LAST:event_depositAccButtonMouseClicked
+
+    private void withdrawAccButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_withdrawAccButtonMouseClicked
+        ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+        double amountInput;
+        int selectedIndex = withdrawAccComboBox.getSelectedIndex();
+        if (jTextField3.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
+        }
+        try {
+            amountInput = Double.parseDouble(jTextField3.getText().trim());
+        }
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Accounts depositedAcc = userAccounts.get(selectedIndex);
+        depositedAcc.setBalanceOfAccount(depositedAcc.getBalanceOfAccount() - amountInput);
+
+        accounts.set(accounts.indexOf(depositedAcc), depositedAcc);
+
+        Transactions newTransaction = new Transactions(depositedAcc.getAccountName(), userAccNo, systemDate, amountInput, "Deposit!");
+        transactions.add(newTransaction);
+
+        saveTransactionsFile();
+        saveAccountsFile();
+        JOptionPane.showMessageDialog(null, "The Withdraw was successful!");
+        dispose();
+        new MainBankMenu().setVisible(true);
+    }//GEN-LAST:event_withdrawAccButtonMouseClicked
+
+    private void jLabel26MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel26MouseClicked
+        transactionsPanel.setVisible(false);
+        depositPanel.setVisible(false);
+        withdrawPanel.setVisible(true);
+    }//GEN-LAST:event_jLabel26MouseClicked
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -1761,7 +2211,12 @@ public class MainBankMenu extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JList<String> AmountTransactionList;
+    private javax.swing.JList<String> DateTransactionList;
     private javax.swing.JPanel Menus;
+    private javax.swing.JList<String> ReceiventNameTransactionList;
+    private javax.swing.JList<String> SenderNameTransactionList;
+    private javax.swing.JList<String> SourceTransactionList;
     private javax.swing.JPanel TabMenu;
     private javax.swing.JComboBox<String> accFromComboBox;
     private javax.swing.JComboBox<String> accFromComboBox1;
@@ -1805,7 +2260,10 @@ public class MainBankMenu extends javax.swing.JFrame {
     private javax.swing.JPanel dashboardAccounts1;
     private javax.swing.JPanel dashboardMenu;
     private javax.swing.JPanel dashboardTab;
+    private javax.swing.JPanel depositAccButton;
+    private javax.swing.JComboBox<String> depositAccComboBox;
     private javax.swing.JPanel depositButton;
+    private javax.swing.JPanel depositPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1831,6 +2289,10 @@ public class MainBankMenu extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
+    private javax.swing.JLabel jLabel32;
+    private javax.swing.JLabel jLabel33;
+    private javax.swing.JLabel jLabel34;
+    private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -1838,7 +2300,13 @@ public class MainBankMenu extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
     private javax.swing.JPanel logoutButton;
     private javax.swing.JPanel paymentsMenu;
     private javax.swing.JPanel paymentsTab;
@@ -1847,14 +2315,17 @@ public class MainBankMenu extends javax.swing.JFrame {
     private javax.swing.JPanel sendAccount;
     private javax.swing.JPanel sendOtherAccPanel;
     private javax.swing.JPanel sendPerson;
+    private javax.swing.JLabel switchButton;
     private javax.swing.JLabel totalBalance;
     private javax.swing.JPanel transactionHistoryButton;
-    private javax.swing.JList<String> transactionList;
     private javax.swing.JPanel transactionMenu;
     private javax.swing.JPanel transactionsPanel;
     private javax.swing.JPanel transactionsTab;
     private javax.swing.JLabel welcomeLabel;
     private javax.swing.JLabel welcomeLabel1;
+    private javax.swing.JPanel withdrawAccButton;
+    private javax.swing.JComboBox<String> withdrawAccComboBox;
     private javax.swing.JPanel withdrawButton;
+    private javax.swing.JPanel withdrawPanel;
     // End of variables declaration//GEN-END:variables
 }
