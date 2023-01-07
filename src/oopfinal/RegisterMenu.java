@@ -16,17 +16,14 @@ import javax.swing.JOptionPane;
  */
 public class RegisterMenu extends javax.swing.JFrame {
 
-    public static ArrayList<BankDetails> bankDetailsList;
+    public static ArrayList<BankDetails> bankDetailsList = new ArrayList<>();
 
     public RegisterMenu() {
-        // Initialize the bankDetailsList as an ArrayList of BankDetails objects
-        bankDetailsList = new ArrayList<BankDetails>();
-
         // Initialize the GUI components
         initComponents();
 
         // Populate the bankDetailsList with data from the BankDetails.dat file
-        populateBankDetailsList();
+        
     }
 
     public static void populateBankDetailsList() {
@@ -254,7 +251,7 @@ public class RegisterMenu extends javax.swing.JFrame {
         Accounts mainAccount = new Accounts(accNo, 1, 0, "Main Account");
         MainBankMenu.accounts.add(mainAccount);
         bankDetailsList.add(bankDetails);
-        bankDetailsList.add(bankDetails);
+        
 
         // Save the bankDetailsList to the BankDetails.dat file
         saveBankDetailsToFile();

@@ -8,14 +8,13 @@ import javax.swing.JOptionPane;
  */
 public class LoginMenu extends javax.swing.JFrame {
 
-    RegisterMenu r = new RegisterMenu();
-
     public static String savedUserAccNo = "";
 
     public LoginMenu() {
 
         initComponents();
-        r.populateBankDetailsList();
+        RegisterMenu.bankDetailsList.clear();
+        RegisterMenu.populateBankDetailsList();
         accountNoLogin.setText(savedUserAccNo);
 
     }
@@ -194,9 +193,7 @@ public class LoginMenu extends javax.swing.JFrame {
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
         // Create a new RegisterMenu object
         RegisterMenu r = new RegisterMenu();
-
-        int userIndx = -1;
-
+        
         // Check if the account number and password fields are empty
         if (this.accountNoLogin.getText().isEmpty() || this.passwordLogin.getText().isEmpty()) {
             // Display error message if either field is empty
@@ -214,8 +211,8 @@ public class LoginMenu extends javax.swing.JFrame {
             // If both the account number and password are in the correct format, search for a matching account number in the bankDetailsList
             String accNoInput = this.accountNoLogin.getText().trim();
             int userIndex = -1;
-            for (int i = 0; i < r.bankDetailsList.size(); i++) {
-                BankDetails userDetails = r.bankDetailsList.get(i);
+            for (int i = 0; i < RegisterMenu.bankDetailsList.size(); i++) {
+                BankDetails userDetails = RegisterMenu.bankDetailsList.get(i);
                 // If a matching account number is found, store the index and retrieve the BankDetails object
                 if (Integer.parseInt(userDetails.getAccNo()) == Integer.parseInt(accNoInput)) {
                     userIndex = i;
@@ -233,7 +230,7 @@ public class LoginMenu extends javax.swing.JFrame {
             }
             else {
                 // If the account number is found, retrieve the BankDetails object and check if the password matches
-                BankDetails userDetails = r.bankDetailsList.get(userIndex);
+                BankDetails userDetails = RegisterMenu.bankDetailsList.get(userIndex);
                 if (!userDetails.getPassword().equals(this.passwordLogin.getText().trim())) {
                     // Display error message if the password is incorrect
                     JOptionPane.showMessageDialog(null, "Your Account Number or Password is invalid!");
@@ -241,7 +238,7 @@ public class LoginMenu extends javax.swing.JFrame {
                 else {
                     // If the password is correct, display a success message and show the MainBankMenu form
                     JOptionPane.showMessageDialog(null, "Successfully logged in!\nHello " + userDetails.getName());
-
+                    
                     new MainBankMenu().setVisible(true);
                     dispose();
 

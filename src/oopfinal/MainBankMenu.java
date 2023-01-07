@@ -19,18 +19,15 @@ import javax.swing.event.*;
  */
 public class MainBankMenu extends javax.swing.JFrame {
 
-    
-    
     public String systemDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime());
     public static String userBDAccNo;
     public static int accNumberCounter = 2;
     public static int lastPage = 1;
-    
-    public static BankDetails getBankDetails(){
+
+    public static BankDetails getBankDetails() {
         return RegisterMenu.bankDetailsList.get(findBankDetailsByAccNo(userBDAccNo));
     }
-    
-    
+
     static ArrayList<Transactions> transactions = new ArrayList<>();
 
     static ArrayList<Accounts> accounts = new ArrayList<>();
@@ -39,9 +36,13 @@ public class MainBankMenu extends javax.swing.JFrame {
 
     public MainBankMenu() {
         initComponents();
+        accounts.clear();
+        transactions.clear();
+        RegisterMenu.bankDetailsList.clear();
         RegisterMenu.populateBankDetailsList();
-        populateAccounts();
         populateTransactions();
+
+        populateAccounts();
         accountDashboard();
         lastPage(lastPage);
 
@@ -53,86 +54,15 @@ public class MainBankMenu extends javax.swing.JFrame {
         for (int i = 0; i < userAccounts.size(); i++) {
             userAccountArray[i] = userAccounts.get(i).getAccountName();
         }
+
+        getTransactionHistory(userTransactions);
+
         accFromComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
         accFromComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
         accToComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
         depositAccComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
         withdrawAccComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
-        
-        if(userTransactions.size() > 0){
-           final String[] userTransactionSenderNameArray = userTransactionSenderNameConstructer();
-        final String[] userTransactionReceiventNameArray = userTransactionRecieventNameConstructer();
-        final String[] userTransactionDateArray = userTransactionDateConstructer(userTransactions);
-        final String[] userTransactionAmountArray = userTransactionAmountConstructer(userTransactions);
-        final String[] userTransactionSourceArray = userTransactionSourceConstructer(userTransactions);
 
-        SenderNameTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = userTransactionSenderNameArray;
-
-            @Override
-            public int getSize() {
-                return strings.length;
-            }
-
-            @Override
-            public String getElementAt(int i) {
-                return strings[i];
-            }
-        });
-        ReceiventNameTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = userTransactionReceiventNameArray;
-
-            @Override
-            public int getSize() {
-                return strings.length;
-            }
-
-            @Override
-            public String getElementAt(int i) {
-                return strings[i];
-            }
-        });
-        DateTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = userTransactionDateArray;
-
-            @Override
-            public int getSize() {
-                return strings.length;
-            }
-
-            @Override
-            public String getElementAt(int i) {
-                return strings[i];
-            }
-        });
-        AmountTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = userTransactionAmountArray;
-
-            @Override
-            public int getSize() {
-                return strings.length;
-            }
-
-            @Override
-            public String getElementAt(int i) {
-                return strings[i];
-            }
-        });
-        SourceTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = userTransactionSourceArray;
-
-            @Override
-            public int getSize() {
-                return strings.length;
-            }
-
-            @Override
-            public String getElementAt(int i) {
-                return strings[i];
-            }
-        }); 
-        }
-        
         DocumentListener listener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -152,6 +82,82 @@ public class MainBankMenu extends javax.swing.JFrame {
         accNoInput.getDocument().addDocumentListener(listener);
     }
 
+    private void getTransactionHistory(ArrayList<Transactions> userTransactions) {
+        if (!userTransactions.isEmpty()) {
+            final String[] userTransactionSenderNameArray = userTransactionSenderNameConstructer();
+            final String[] userTransactionReceiventNameArray = userTransactionRecieventNameConstructer();
+            final String[] userTransactionDateArray = userTransactionDateConstructer(userTransactions);
+            final String[] userTransactionAmountArray = userTransactionAmountConstructer(userTransactions);
+            final String[] userTransactionSourceArray = userTransactionSourceConstructer(userTransactions);
+
+            SenderNameTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+                String[] strings = userTransactionSenderNameArray;
+
+                @Override
+                public int getSize() {
+                    return strings.length;
+                }
+
+                @Override
+                public String getElementAt(int i) {
+                    return strings[i];
+                }
+            });
+            ReceiventNameTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+                String[] strings = userTransactionReceiventNameArray;
+
+                @Override
+                public int getSize() {
+                    return strings.length;
+                }
+
+                @Override
+                public String getElementAt(int i) {
+                    return strings[i];
+                }
+            });
+            DateTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+                String[] strings = userTransactionDateArray;
+
+                @Override
+                public int getSize() {
+                    return strings.length;
+                }
+
+                @Override
+                public String getElementAt(int i) {
+                    return strings[i];
+                }
+            });
+            AmountTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+                String[] strings = userTransactionAmountArray;
+
+                @Override
+                public int getSize() {
+                    return strings.length;
+                }
+
+                @Override
+                public String getElementAt(int i) {
+                    return strings[i];
+                }
+            });
+            SourceTransactionList.setModel(new javax.swing.AbstractListModel<String>() {
+                String[] strings = userTransactionSourceArray;
+
+                @Override
+                public int getSize() {
+                    return strings.length;
+                }
+
+                @Override
+                public String getElementAt(int i) {
+                    return strings[i];
+                }
+            });
+        }
+    }
+
     private String[] userTransactionSenderNameConstructer() {
         ArrayList<Transactions> userTransactions = transactionsByAccNo(transactions, userAccNo);
 
@@ -166,9 +172,8 @@ public class MainBankMenu extends javax.swing.JFrame {
 
     private String[] userTransactionRecieventNameConstructer() {
         ArrayList<Transactions> userTransactions = transactionsByAccNo(transactions, userAccNo);
-        ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+
         String[] userTransactionArray = new String[userTransactions.size()];
-        int selectedIndex = withdrawAccComboBox.getSelectedIndex();
 
         for (int i = 0; i < userTransactions.size(); i++) {
 
@@ -227,7 +232,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             accOwnerName.setText("You cannot transfer to your own account!");
         }
         else {
-            String name = getBankDetails().getName();
+            String name = RegisterMenu.bankDetailsList.get(findBankDetailsByAccNo(accNo)).getName();
             accOwnerName.setText(nameMask(name, 5));
         }
     }
@@ -1991,6 +1996,9 @@ public class MainBankMenu extends javax.swing.JFrame {
             if (amountInput > senderBalance) {
                 JOptionPane.showMessageDialog(null, "Insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
             }
+            else if (amountInput < 0) {
+                JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            }
             else {
                 Accounts senderAccount = userAccounts.get(senderAccIndex);
                 Accounts receiverAccount = userAccounts.get(receiverAccIndex);
@@ -2048,8 +2056,11 @@ public class MainBankMenu extends javax.swing.JFrame {
         if (senderAcc.getBalanceOfAccount() < amountInput) {
             JOptionPane.showMessageDialog(null, "insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
+        else if (amountInput < 0) {
+            JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
+        }
         else {
-            BankDetails receiventBankDetails = getBankDetails();
+            BankDetails receiventBankDetails = RegisterMenu.bankDetailsList.get(findBankDetailsByAccNo(receiventAccNo));
             ArrayList<Accounts> receiventsAccounts = findAccountsByAccNo(accounts, receiventAccNo);
             Accounts senderAccount = userAccounts.get(senderAccIndex);
             Accounts receiverAccount = receiventsAccounts.get(0);
@@ -2102,9 +2113,6 @@ public class MainBankMenu extends javax.swing.JFrame {
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
         double amountInput;
         int selectedIndex = depositAccComboBox.getSelectedIndex();
-        if (jTextField1.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
-        }
         try {
             amountInput = Double.parseDouble(jTextField1.getText().trim());
         }
@@ -2112,29 +2120,34 @@ public class MainBankMenu extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        if (jTextField1.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
+        }
+        else if (amountInput < 0) {
+            JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
+        }
+        else {
+            Accounts depositedAcc = userAccounts.get(selectedIndex);
+            depositedAcc.setBalanceOfAccount(depositedAcc.getBalanceOfAccount() + amountInput);
 
-        Accounts depositedAcc = userAccounts.get(selectedIndex);
-        depositedAcc.setBalanceOfAccount(depositedAcc.getBalanceOfAccount() + amountInput);
+            accounts.set(accounts.indexOf(depositedAcc), depositedAcc);
 
-        accounts.set(accounts.indexOf(depositedAcc), depositedAcc);
+            Transactions newTransaction = new Transactions(userAccNo, getBankDetails().getName(), depositedAcc.getAccountName(), systemDate, amountInput, "Deposit!");
+            transactions.add(newTransaction);
 
-        Transactions newTransaction = new Transactions(userAccNo, getBankDetails().getName(), depositedAcc.getAccountName(), systemDate, amountInput, "Deposit!");
-        transactions.add(newTransaction);
+            saveTransactionsFile();
+            saveAccountsFile();
+            JOptionPane.showMessageDialog(null, "The deposit was successful!");
+            dispose();
+            new MainBankMenu().setVisible(true);
+        }
 
-        saveTransactionsFile();
-        saveAccountsFile();
-        JOptionPane.showMessageDialog(null, "The deposit was successful!");
-        dispose();
-        new MainBankMenu().setVisible(true);
     }//GEN-LAST:event_depositAccButtonMouseClicked
 
     private void withdrawAccButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_withdrawAccButtonMouseClicked
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
         double amountInput;
         int selectedIndex = withdrawAccComboBox.getSelectedIndex();
-        if (jTextField3.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
-        }
         try {
             amountInput = Double.parseDouble(jTextField3.getText().trim());
         }
@@ -2142,20 +2155,29 @@ public class MainBankMenu extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        if (jTextField3.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
+        }
+        else if (amountInput < 0) {
+            JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
+        }
+        else {
+            Accounts withdrawAcc = userAccounts.get(selectedIndex);
+            withdrawAcc.setBalanceOfAccount(withdrawAcc.getBalanceOfAccount() - amountInput);
 
-        Accounts withdrawAcc = userAccounts.get(selectedIndex);
-        withdrawAcc.setBalanceOfAccount(withdrawAcc.getBalanceOfAccount() - amountInput);
+            accounts.set(accounts.indexOf(withdrawAcc), withdrawAcc);
 
-        accounts.set(accounts.indexOf(withdrawAcc), withdrawAcc);
+            Transactions newTransaction = new Transactions(userAccNo, withdrawAcc.getAccountName(), getBankDetails().getName(), systemDate, amountInput, "Withdraw!");
+            transactions.add(newTransaction);
 
-        Transactions newTransaction = new Transactions(userAccNo, withdrawAcc.getAccountName(), getBankDetails().getName(), systemDate, amountInput, "Withdraw!");
-        transactions.add(newTransaction);
+            saveTransactionsFile();
+            saveAccountsFile();
+            JOptionPane.showMessageDialog(null, "The Withdraw was successful!");
+            dispose();
+            new MainBankMenu().setVisible(true);
+        }
 
-        saveTransactionsFile();
-        saveAccountsFile();
-        JOptionPane.showMessageDialog(null, "The Withdraw was successful!");
-        dispose();
-        new MainBankMenu().setVisible(true);
+
     }//GEN-LAST:event_withdrawAccButtonMouseClicked
 
     private void jLabel26MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel26MouseClicked
