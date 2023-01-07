@@ -481,7 +481,10 @@ public class MainBankMenu extends javax.swing.JFrame {
         else {
             totalBalance.setText("$ " + s);
         }
-        
+        String acc1bal;
+        String acc2bal;
+        String acc3bal;
+        String acc4bal;
         //rest of the code is only just showing and hiding account card images and setting the balances.
         switch (userAccounts.size()) {
             case 0:
@@ -489,6 +492,7 @@ public class MainBankMenu extends javax.swing.JFrame {
                 dashboardAccounts1.setVisible(false);
                 break;
             case 1:
+                acc1bal = df.format(userAccounts.get(0).getBalanceOfAccount());
                 dashboardAccounts.setVisible(true);
                 accNo2.setVisible(false);
                 accNo2Balance.setVisible(false);
@@ -512,11 +516,13 @@ public class MainBankMenu extends javax.swing.JFrame {
                 accNo8Balance.setVisible(false);
                 accNo8Trash.setVisible(false);
                 accNo1Label.setText(userAccounts.get(0).getAccountName());
-                accNo1Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo1Balance.setText(" Balance : $ \n" + acc1bal);
                 accNo5Label.setText(userAccounts.get(0).getAccountName());
-                accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo5Balance.setText(" Balance : $ \n" + acc1bal);
                 break;
             case 2:
+                acc1bal = df.format(userAccounts.get(0).getBalanceOfAccount());
+                acc2bal = df.format(userAccounts.get(1).getBalanceOfAccount());
                 dashboardAccounts.setVisible(true);
                 accNo3.setVisible(false);
                 accNo3Balance.setVisible(false);
@@ -533,15 +539,18 @@ public class MainBankMenu extends javax.swing.JFrame {
                 accNo8Balance.setVisible(false);
                 accNo8Trash.setVisible(false);
                 accNo1Label.setText(userAccounts.get(0).getAccountName());
-                accNo1Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo1Balance.setText(" Balance : $ \n" + acc1bal);
                 accNo2Label.setText(userAccounts.get(1).getAccountName());
-                accNo2Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+                accNo2Balance.setText(" Balance : $ \n" + acc2bal);
                 accNo5Label.setText(userAccounts.get(0).getAccountName());
-                accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo5Balance.setText(" Balance : $ \n" + acc1bal);
                 accNo6Label.setText(userAccounts.get(1).getAccountName());
-                accNo6Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+                accNo6Balance.setText(" Balance : $ \n" + acc2bal);
                 break;
             case 3:
+                acc1bal = df.format(userAccounts.get(0).getBalanceOfAccount());
+                acc2bal = df.format(userAccounts.get(1).getBalanceOfAccount());
+                acc3bal = df.format(userAccounts.get(2).getBalanceOfAccount());
                 dashboardAccounts.setVisible(true);
                 accNo4.setVisible(false);
                 accNo4Balance.setVisible(false);
@@ -551,37 +560,41 @@ public class MainBankMenu extends javax.swing.JFrame {
                 accNo8Balance.setVisible(false);
                 accNo8Trash.setVisible(false);
                 accNo1Label.setText(userAccounts.get(0).getAccountName());
-                accNo1Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo1Balance.setText(" Balance : $ \n" + acc1bal);
                 accNo2Label.setText(userAccounts.get(1).getAccountName());
-                accNo2Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+                accNo2Balance.setText(" Balance : $ \n" + acc2bal);
                 accNo3Label.setText(userAccounts.get(2).getAccountName());
-                accNo3Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+                accNo3Balance.setText(" Balance : $ \n" + acc3bal);
                 accNo5Label.setText(userAccounts.get(0).getAccountName());
-                accNo5Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo5Balance.setText(" Balance : $ \n" + acc1bal);
                 accNo6Label.setText(userAccounts.get(1).getAccountName());
-                accNo6Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+                accNo6Balance.setText(" Balance : $ \n" + acc2bal);
                 accNo7Label.setText(userAccounts.get(2).getAccountName());
-                accNo7Balance.setText(" Balance : $ \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+                accNo7Balance.setText(" Balance : $ \n" + acc3bal);
                 break;
             case 4:
+                acc1bal = df.format(userAccounts.get(0).getBalanceOfAccount());
+                acc2bal = df.format(userAccounts.get(1).getBalanceOfAccount());
+                acc3bal = df.format(userAccounts.get(2).getBalanceOfAccount());
+                acc4bal = df.format(userAccounts.get(3).getBalanceOfAccount());
                 dashboardAccounts.setVisible(true);
                 dashboardAccounts1.setVisible(true);
                 accNo1Label.setText(userAccounts.get(0).getAccountName());
-                accNo1Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo1Balance.setText(" Balance : \n" + acc1bal);
                 accNo2Label.setText(userAccounts.get(1).getAccountName());
-                accNo2Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+                accNo2Balance.setText(" Balance : \n" + acc2bal);
                 accNo3Label.setText(userAccounts.get(2).getAccountName());
-                accNo3Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+                accNo3Balance.setText(" Balance : \n" + acc3bal);
                 accNo4Label.setText(userAccounts.get(3).getAccountName());
-                accNo4Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(3).getBalanceOfAccount()));
+                accNo4Balance.setText(" Balance : \n" + acc4bal);
                 accNo5Label.setText(userAccounts.get(0).getAccountName());
-                accNo5Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(0).getBalanceOfAccount()));
+                accNo5Balance.setText(" Balance : \n" + acc1bal);
                 accNo6Label.setText(userAccounts.get(1).getAccountName());
-                accNo6Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(1).getBalanceOfAccount()));
+                accNo6Balance.setText(" Balance : \n" + acc2bal);
                 accNo7Label.setText(userAccounts.get(2).getAccountName());
-                accNo7Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(2).getBalanceOfAccount()));
+                accNo7Balance.setText(" Balance : \n" + acc3bal);
                 accNo8Label.setText(userAccounts.get(3).getAccountName());
-                accNo8Balance.setText(" Balance : \n" + String.valueOf(userAccounts.get(3).getBalanceOfAccount()));
+                accNo8Balance.setText(" Balance : \n" + acc4bal);
                 break;
             default:
                 break;
@@ -2091,7 +2104,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
 
         // If the user does not have any accounts, display a prompt to create a new account
-        if (senderAccIndex == -1 || receiverAccIndex == -1) {
+        else if (senderAccIndex == -1 || receiverAccIndex == -1) {
             int result = JOptionPane.showConfirmDialog(null, "You don't have any account.\nDo you want to open a new account?", "No Account!", JOptionPane.YES_NO_OPTION);
             if (result == 0) {
                 accountsTabMouseClicked(evt);
@@ -2115,7 +2128,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             }
 
             // If the input amount is negative, display error message
-            if (amountInput < 0) {
+            else if (amountInput < 0) {
                 JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
             }
             else {
@@ -2165,16 +2178,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         Accounts senderAcc = userAccounts.get(senderAccIndex);
         int bankDetailIndex = findBankDetailsByAccNo(receiventAccNo);
         double amountInput;
-        // If the recipient's account does not exist, display error message
-        if (bankDetailIndex == -1) {
-            JOptionPane.showMessageDialog(null, "The account you are trying to send does not exist!", "Warning!", JOptionPane.WARNING_MESSAGE);
-        }
-
-        // If any of the input fields are empty, display error message
-        if (jTextField2.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
-        }
-
+        
         // Try to parse the input amount as a double
         try {
             amountInput = Double.parseDouble(jTextField2.getText().trim());
@@ -2184,16 +2188,32 @@ public class MainBankMenu extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
+        
+        // If the recipient's account does not exist, display error message
+        if (bankDetailIndex == -1) {
+            JOptionPane.showMessageDialog(null, "The account you are trying to send does not exist!", "Warning!", JOptionPane.WARNING_MESSAGE);
+        }
+        
+        //if the receivent account number is the same as user account number, display error message
+        else if (receiventAccNo.equals(userAccNo)){
+            JOptionPane.showMessageDialog(null, "You can't send to your own account!", "Warning!", JOptionPane.WARNING_MESSAGE);
+        }
+        
+        // If any of the input fields are empty, display error message
+        else if (jTextField2.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
+        }
+        
         // If the sender does not have sufficient balance, display error message
-        if (senderAcc.getBalanceOfAccount() < amountInput) {
+        else if (senderAcc.getBalanceOfAccount() < amountInput) {
             JOptionPane.showMessageDialog(null, "insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
 
         // If the input amount is negative, display error message
-        if (amountInput < 0) {
+        else if (amountInput < 0) {
             JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
+        
         else {
             // Get the bank details of the recipient and their accounts
             BankDetails receiventBankDetails = RegisterMenu.bankDetailsList.get(findBankDetailsByAccNo(receiventAccNo));
@@ -2276,7 +2296,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
 
         // If the parsed double value is less than 0, display a warning message and return
-        if (amountInput < 0) {
+        else if (amountInput < 0) {
             JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
         // Otherwise, proceed with the deposit
@@ -2331,7 +2351,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
 
         // If the parsed double value is less than 0, display a warning message and return
-        if (amountInput < 0) {
+        else if (amountInput < 0) {
             JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
         // Otherwise, proceed with the withdrawal
