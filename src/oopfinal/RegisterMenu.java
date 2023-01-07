@@ -23,7 +23,8 @@ public class RegisterMenu extends javax.swing.JFrame {
         initComponents();
 
         // Populate the bankDetailsList with data from the BankDetails.dat file
-        
+        bankDetailsList.clear();
+        populateBankDetailsList();
     }
 
     public static void populateBankDetailsList() {
@@ -80,10 +81,12 @@ public class RegisterMenu extends javax.swing.JFrame {
         // It will generate 6 digit random Number.
         // from 0 to 999999
         Random rnd = new Random();
-        int number = rnd.nextInt(999999);
-
+        String number = String.format("%06d", rnd.nextInt(999999));
+        if(MainBankMenu.findBankDetailsByAccNo(number) != -1){
+            rndAccNo();
+        }
         // this will convert any number sequence into 6 character.
-        return String.format("%06d", number);
+        return number;
     }
 
     public boolean containsOnlyLetters(String str) {
@@ -241,6 +244,10 @@ public class RegisterMenu extends javax.swing.JFrame {
         // Check if the age contains only digits
         if (!containsOnlyNumbers(ageStr)) {
             JOptionPane.showMessageDialog(null, "Your age must contain only integers!");
+            return;
+        }
+        if(Integer.parseInt(ageStr)<18){
+            JOptionPane.showMessageDialog(null, "You must be 18 or older to register!");
             return;
         }
 

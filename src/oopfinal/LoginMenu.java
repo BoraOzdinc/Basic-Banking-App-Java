@@ -199,11 +199,11 @@ public class LoginMenu extends javax.swing.JFrame {
             // Display error message if either field is empty
             JOptionPane.showMessageDialog(null, "You Have To Fill All The Details!");
         }
-        else if (!isSixDigit(this.accountNoLogin.getText())) {
+        if (!isSixDigit(this.accountNoLogin.getText())) {
             // Display error message if the account number is not a 6-digit string
             JOptionPane.showMessageDialog(null, "Account No must be 6 digit long and Cannot contain any special characters!");
         }
-        else if (!isFourDigit(this.passwordLogin.getText())) {
+        if (!isFourDigit(this.passwordLogin.getText())) {
             // Display error message if the password is not a 4-digit string
             JOptionPane.showMessageDialog(null, "Password must be 4 digit long and cannot Contain any special characters!");
         }

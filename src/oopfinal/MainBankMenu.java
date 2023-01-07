@@ -228,7 +228,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         if (bankDetailsIndex == -1) {
             accOwnerName.setText("This account cannot be found.");
         }
-        else if (getBankDetails().getAccNo().equals(getBankDetails().getName())) {
+        if (getBankDetails().getAccNo().equals(getBankDetails().getName())) {
             accOwnerName.setText("You cannot transfer to your own account!");
         }
         else {
@@ -1978,7 +1978,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         if (senderAccIndex == receiverAccIndex) {
             JOptionPane.showMessageDialog(null, "You cannot transfer money to the same account!", "Error!", JOptionPane.WARNING_MESSAGE);
         }
-        else if (senderAccIndex == -1 || receiverAccIndex == -1) {
+        if (senderAccIndex == -1 || receiverAccIndex == -1) {
             int x = JOptionPane.showConfirmDialog(null, "You don't have any account.\nDo you want to open a new account?", "No Account!", JOptionPane.YES_NO_OPTION);
             if (x == 0) {
                 accountsTabMouseClicked(evt);
@@ -1996,7 +1996,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             if (amountInput > senderBalance) {
                 JOptionPane.showMessageDialog(null, "Insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
             }
-            else if (amountInput < 0) {
+            if (amountInput < 0) {
                 JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
             }
             else {
@@ -2043,7 +2043,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         if (bankDetailIndex == -1) {
             JOptionPane.showMessageDialog(null, "The account you are trying to send does not exist!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
-        else if (jTextField2.getText().isEmpty()) {
+        if (jTextField2.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
         try {
@@ -2056,7 +2056,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         if (senderAcc.getBalanceOfAccount() < amountInput) {
             JOptionPane.showMessageDialog(null, "insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
-        else if (amountInput < 0) {
+        if (amountInput < 0) {
             JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
         else {
@@ -2123,7 +2123,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         if (jTextField1.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
-        else if (amountInput < 0) {
+        if (amountInput < 0) {
             JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
         else {
@@ -2158,7 +2158,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         if (jTextField3.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
-        else if (amountInput < 0) {
+        if (amountInput < 0) {
             JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
         else {
