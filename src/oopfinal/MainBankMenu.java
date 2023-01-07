@@ -19,26 +19,27 @@ import javax.swing.event.*;
  */
 public class MainBankMenu extends javax.swing.JFrame {
 
-    static RegisterMenu r = new RegisterMenu();
-    static LoginMenu l = new LoginMenu();
+    
+    
     public String systemDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime());
-    public static int userIndex;
+    public static String userBDAccNo;
     public static int accNumberCounter = 2;
     public static int lastPage = 1;
-    BankDetails bankDetails = r.bankDetailsList.get(userIndex);
+    
+    public static BankDetails getBankDetails(){
+        return RegisterMenu.bankDetailsList.get(findBankDetailsByAccNo(userBDAccNo));
+    }
+    
+    
+    static ArrayList<Transactions> transactions = new ArrayList<>();
 
-    ArrayList<Transactions> transactions;
+    static ArrayList<Accounts> accounts = new ArrayList<>();
 
-    ArrayList<Accounts> accounts;
-
-    String userAccNo = bankDetails.getAccNo();
+    String userAccNo = getBankDetails().getAccNo();
 
     public MainBankMenu() {
-        accounts = new ArrayList<>();
-        transactions = new ArrayList<>();
-
         initComponents();
-        r.populateBankDetailsList();
+        RegisterMenu.populateBankDetailsList();
         populateAccounts();
         populateTransactions();
         accountDashboard();
@@ -57,6 +58,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         accToComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
         depositAccComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
         withdrawAccComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
+        
         if(userTransactions.size() > 0){
            final String[] userTransactionSenderNameArray = userTransactionSenderNameConstructer();
         final String[] userTransactionReceiventNameArray = userTransactionRecieventNameConstructer();
@@ -221,11 +223,11 @@ public class MainBankMenu extends javax.swing.JFrame {
         if (bankDetailsIndex == -1) {
             accOwnerName.setText("This account cannot be found.");
         }
-        else if (bankDetails.getAccNo().equals(r.bankDetailsList.get(bankDetailsIndex).getName())) {
+        else if (getBankDetails().getAccNo().equals(getBankDetails().getName())) {
             accOwnerName.setText("You cannot transfer to your own account!");
         }
         else {
-            String name = r.bankDetailsList.get(bankDetailsIndex).getName();
+            String name = getBankDetails().getName();
             accOwnerName.setText(nameMask(name, 5));
         }
     }
@@ -306,7 +308,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
     }
 
-    public void saveTransactionsFile() {
+    public static void saveTransactionsFile() {
         try {
             // Create a FileOutputStream to write to the BankDetails.dat file
             FileOutputStream file2 = new FileOutputStream("Transactions.dat");
@@ -325,7 +327,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
     }
 
-    public void saveAccountsFile() {
+    public static void saveAccountsFile() {
         try {
             // Create a FileOutputStream to write to the BankDetails.dat file
             FileOutputStream file2 = new FileOutputStream("Accounts.dat");
@@ -344,7 +346,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
     }
 
-    public final void populateTransactions() {
+    public static final void populateTransactions() {
         try {
             // Create a FileInputStream to read from the BankDetails.dat file
             FileInputStream file = new FileInputStream("Transactions.dat");
@@ -375,7 +377,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
     }
 
-    public final void populateAccounts() {
+    public static final void populateAccounts() {
         try {
             // Create a FileInputStream to read from the BankDetails.dat file
             FileInputStream file = new FileInputStream("Accounts.dat");
@@ -409,7 +411,7 @@ public class MainBankMenu extends javax.swing.JFrame {
     public final void accountDashboard() {
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
 
-        welcomeLabel.setText(bankDetails.getName());
+        welcomeLabel.setText(getBankDetails().getName());
 
         double x = 0;
         for (int i = 0; i < userAccounts.size(); i++) {
@@ -532,9 +534,9 @@ public class MainBankMenu extends javax.swing.JFrame {
 
     public static int findBankDetailsByAccNo(String str) {
         // loop through the list
-        for (int i = 0; i < r.bankDetailsList.size(); i++) {
+        for (int i = 0; i < RegisterMenu.bankDetailsList.size(); i++) {
             // get the current array
-            BankDetails array = r.bankDetailsList.get(i);
+            BankDetails array = RegisterMenu.bankDetailsList.get(i);
 
             // if the first element of the array equals the search string, return the index
             if (array.getAccNo().equals(str)) {
@@ -2047,7 +2049,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
         else {
-            BankDetails receiventBankDetails = r.bankDetailsList.get(bankDetailIndex);
+            BankDetails receiventBankDetails = getBankDetails();
             ArrayList<Accounts> receiventsAccounts = findAccountsByAccNo(accounts, receiventAccNo);
             Accounts senderAccount = userAccounts.get(senderAccIndex);
             Accounts receiverAccount = receiventsAccounts.get(0);
@@ -2058,7 +2060,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             accounts.set(accounts.indexOf(senderAccount), senderAccount);
             accounts.set(accounts.indexOf(receiverAccount), receiverAccount);
 
-            Transactions newTransaction = new Transactions(userAccNo, bankDetails.getName(), receiventBankDetails.getName(), systemDate, amountInput, senderAccount.getAccountName());
+            Transactions newTransaction = new Transactions(userAccNo, getBankDetails().getName(), receiventBankDetails.getName(), systemDate, amountInput, senderAccount.getAccountName());
 
             transactions.add(newTransaction);
 
@@ -2116,7 +2118,7 @@ public class MainBankMenu extends javax.swing.JFrame {
 
         accounts.set(accounts.indexOf(depositedAcc), depositedAcc);
 
-        Transactions newTransaction = new Transactions(userAccNo, bankDetails.getName(), depositedAcc.getAccountName(), systemDate, amountInput, "Deposit!");
+        Transactions newTransaction = new Transactions(userAccNo, getBankDetails().getName(), depositedAcc.getAccountName(), systemDate, amountInput, "Deposit!");
         transactions.add(newTransaction);
 
         saveTransactionsFile();
@@ -2146,7 +2148,7 @@ public class MainBankMenu extends javax.swing.JFrame {
 
         accounts.set(accounts.indexOf(withdrawAcc), withdrawAcc);
 
-        Transactions newTransaction = new Transactions(userAccNo, withdrawAcc.getAccountName(), bankDetails.getName(), systemDate, amountInput, "Withdraw!");
+        Transactions newTransaction = new Transactions(userAccNo, withdrawAcc.getAccountName(), getBankDetails().getName(), systemDate, amountInput, "Withdraw!");
         transactions.add(newTransaction);
 
         saveTransactionsFile();
