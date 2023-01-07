@@ -12,36 +12,45 @@ import java.util.Date;
 public class Transactions implements Serializable {
 
     private static final long serialVersionUID = -6053234864767433320L;
-
-    private String senderAccNo;
-    private String receiverAccNo;
+    
+    private String userAccNo;
+    private String senderAcc;
+    private String receiverAcc;
     private String transactionDate;
     private double amount;
     private String paymentSource;
 
-    public Transactions(String senderAccNo, String receiverAccNo, String transactionDate, double amount, String paymentSource) {
-        this.senderAccNo = senderAccNo;
-        this.receiverAccNo = receiverAccNo;
+    public Transactions(String userAccNo, String senderAcc, String receiverAcc, String transactionDate, double amount, String paymentSource) {
+        this.userAccNo = userAccNo;
+        this.senderAcc = senderAcc;
+        this.receiverAcc = receiverAcc;
         this.transactionDate = transactionDate;
         this.amount = amount;
         this.paymentSource = paymentSource;
-
     }
 
-    public String getSenderAccNo() {
-        return senderAccNo;
+    public String getUserAccNo() {
+        return userAccNo;
     }
 
-    public void setSenderAccNo(String senderAccNo) {
-        this.senderAccNo = senderAccNo;
+    public void setUserAccNo(String userAccNo) {
+        this.userAccNo = userAccNo;
     }
 
-    public String getReceiverAccNo() {
-        return receiverAccNo;
+    public String getSenderAcc() {
+        return senderAcc;
     }
 
-    public void setReceiverAccNo(String receiverAccNo) {
-        this.receiverAccNo = receiverAccNo;
+    public void setSenderAcc(String senderAcc) {
+        this.senderAcc = senderAcc;
+    }
+
+    public String getReceiverAcc() {
+        return receiverAcc;
+    }
+
+    public void setReceiverAcc(String receiverAcc) {
+        this.receiverAcc = receiverAcc;
     }
 
     public String getTransactionDate() {
@@ -67,5 +76,7 @@ public class Transactions implements Serializable {
     public void setPaymentSource(String paymentSource) {
         this.paymentSource = paymentSource;
     }
+
+    
 
 }
