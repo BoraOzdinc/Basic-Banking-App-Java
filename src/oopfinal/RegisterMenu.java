@@ -125,6 +125,10 @@ public class RegisterMenu extends javax.swing.JFrame {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Register");
 
+        registerName.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+
+        registerPassword.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+
         registerButton.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
         registerButton.setText("Create New Account");
         registerButton.addActionListener(new java.awt.event.ActionListener() {
@@ -149,6 +153,8 @@ public class RegisterMenu extends javax.swing.JFrame {
 
         jLabel4.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
         jLabel4.setText("Your Age");
+
+        registerAge.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -252,9 +258,12 @@ public class RegisterMenu extends javax.swing.JFrame {
         // Save the bankDetailsList to the BankDetails.dat file
         saveBankDetailsToFile();
         mb.saveAccountsFile();
-
+        
         // Show a success message with the account number
         JOptionPane.showMessageDialog(null, "Successfully Registered!\nHello " + name + " Your Account Number is " + accNo + "\nPlease remember your account number!");
+        LoginMenu.savedUserAccNo = accNo;
+        new LoginMenu().setVisible(true);
+        dispose();
     }//GEN-LAST:event_registerButtonActionPerformed
 
     public static void main(String args[]) {

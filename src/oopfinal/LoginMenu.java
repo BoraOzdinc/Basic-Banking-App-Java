@@ -10,13 +10,13 @@ public class LoginMenu extends javax.swing.JFrame {
 
     RegisterMenu r = new RegisterMenu();
 
-    public String userAccNo;
+    public static String savedUserAccNo = "";
 
     public LoginMenu() {
 
         initComponents();
-
         r.populateBankDetailsList();
+        accountNoLogin.setText(savedUserAccNo);
 
     }
 

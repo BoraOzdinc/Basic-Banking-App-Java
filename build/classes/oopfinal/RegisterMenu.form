@@ -98,8 +98,18 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="registerName">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Poppins" size="12" style="0"/>
+        </Property>
+      </Properties>
     </Component>
     <Component class="javax.swing.JPasswordField" name="registerPassword">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Poppins" size="12" style="0"/>
+        </Property>
+      </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="registerButton">
       <Properties>
@@ -148,6 +158,11 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="registerAge">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Poppins" size="12" style="0"/>
+        </Property>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>
