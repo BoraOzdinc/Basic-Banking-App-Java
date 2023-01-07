@@ -20,19 +20,19 @@ import javax.swing.event.*;
 public class MainBankMenu extends javax.swing.JFrame {
 
     public String systemDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime());
-    public static String userBDAccNo;
-    public static int accNumberCounter = 2;
-    public static int lastPage = 1;
+    public static String userAccNo; //get user's account number from login menu.
 
+    public static int accNumberCounter = 2; //because first account created from register counter starts from 2.
+
+    public static int lastPage = 1; //depending of the lastpage int when form re-opens it can continue...
+
+    //getting user's bank details
     public static BankDetails getBankDetails() {
-        return RegisterMenu.bankDetailsList.get(findBankDetailsByAccNo(userBDAccNo));
+        return RegisterMenu.bankDetailsList.get(findBankDetailsByAccNo(userAccNo));
     }
 
     static ArrayList<Transactions> transactions = new ArrayList<>();
-
     static ArrayList<Accounts> accounts = new ArrayList<>();
-
-    String userAccNo = getBankDetails().getAccNo();
 
     public MainBankMenu() {
         initComponents();
@@ -63,23 +63,34 @@ public class MainBankMenu extends javax.swing.JFrame {
         depositAccComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
         withdrawAccComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(userAccountArray));
 
+        /*
+        This code adds the DocumentListener object to the document of the accNoInput text field,
+        so that the DocumentListener can listen for changes to the text in the text field.
+        When a change is detected, the updateLabel method is called.
+         */
+        // Create a new DocumentListener object
         DocumentListener listener = new DocumentListener() {
+            // This method is called when text is inserted into the document
             @Override
             public void insertUpdate(DocumentEvent e) {
                 updateLabel();
             }
+            // This method is called when text is removed from the document
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 updateLabel();
             }
+            // This method is called when the document is changed in some other way (e.g. text style is changed)
 
             @Override
             public void changedUpdate(DocumentEvent e) {
                 updateLabel();
             }
         };
+        // Add the DocumentListener to the document of the accNoInput text field
         accNoInput.getDocument().addDocumentListener(listener);
+
     }
 
     private void getTransactionHistory(ArrayList<Transactions> userTransactions) {
@@ -158,79 +169,105 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
     }
 
-    private String[] userTransactionSenderNameConstructer() {
+    private static String[] userTransactionSenderNameConstructer() {
+        // Get the transactions associated with the user's account number
         ArrayList<Transactions> userTransactions = transactionsByAccNo(transactions, userAccNo);
 
+        // Create a new string array with the same size as the user's transactions list
         String[] userTransactionArray = new String[userTransactions.size()];
 
+        // Iterate through the user's transactions list
         for (int i = 0; i < userTransactions.size(); i++) {
 
+            // Set the element at the current index to the sender account name of the current transaction
             userTransactionArray[i] = userTransactions.get(i).getSenderAcc();
         }
+        // Return the completed string array
         return userTransactionArray;
     }
 
-    private String[] userTransactionRecieventNameConstructer() {
+    private static String[] userTransactionRecieventNameConstructer() {
+        // Get the transactions associated with the user's account number
         ArrayList<Transactions> userTransactions = transactionsByAccNo(transactions, userAccNo);
 
+        // Create a new string array with the same size as the user's transactions list
         String[] userTransactionArray = new String[userTransactions.size()];
 
+        // Iterate through the user's transactions list
         for (int i = 0; i < userTransactions.size(); i++) {
 
+            // Set the element at the current index to the receiver account name of the current transaction
             userTransactionArray[i] = userTransactions.get(i).getReceiverAcc();
         }
+        // Return the completed string array
         return userTransactionArray;
     }
 
     public static String[] userTransactionDateConstructer(ArrayList<Transactions> userTransactions) {
+        // Create a new string array with the same size as the user's transactions list
         String[] userTransactionArray = new String[userTransactions.size()];
+
+        // Iterate through the user's transactions list
         for (int i = 0; i < userTransactions.size(); i++) {
-
-            String transactionDate = userTransactions.get(i).getTransactionDate();
-
-            userTransactionArray[i] = transactionDate;
+            // Set the element at the current index to the date of the current transaction
+            userTransactionArray[i] = userTransactions.get(i).getTransactionDate();
         }
+        // Return the completed string array
         return userTransactionArray;
     }
 
     public static String[] userTransactionAmountConstructer(ArrayList<Transactions> userTransactions) {
+        // Create a new string array with the same size as the user's transactions list
         String[] userTransactionArray = new String[userTransactions.size()];
+
+        // Iterate through the user's transactions list
         for (int i = 0; i < userTransactions.size(); i++) {
-
-            double amount = userTransactions.get(i).getAmount();
-
-            userTransactionArray[i] = "$" + String.valueOf(amount);
+            // Set the element at the current index to the amount of the current transaction, formatted as a dollar amount
+            userTransactionArray[i] = "$" + String.valueOf(userTransactions.get(i).getAmount());
         }
+        // Return the completed string array
         return userTransactionArray;
     }
 
     public static String[] userTransactionSourceConstructer(ArrayList<Transactions> userTransactions) {
+        // Create a new string array with the same size as the user's transactions list
         String[] userTransactionArray = new String[userTransactions.size()];
+
+        // Iterate through the user's transactions list
         for (int i = 0; i < userTransactions.size(); i++) {
-
-            String source = userTransactions.get(i).getPaymentSource();
-
-            userTransactionArray[i] = source;
+            // Set the element at the current index to the payment source of the current transaction
+            userTransactionArray[i] = userTransactions.get(i).getPaymentSource();
         }
+        // Return the completed string array
         return userTransactionArray;
     }
 
     private void updateLabel() {
-        // get the text from the text field
+
+        // Get the account number from the text field
         String accNo = accNoInput.getText();
+
+        // Find the bank details associated with the account number
         int bankDetailsIndex = findBankDetailsByAccNo(accNo);
+
+        // Try to parse the account number as an integer
         try {
             Integer.parseInt(accNo);
         }
+        // If the parsing fails, set the account owner name label to an error message
         catch (NumberFormatException e) {
             accOwnerName.setText("You must enter a 6 digit account number.");
         }
+
+        // If the bank details cannot be found, set the account owner name label to an error message
         if (bankDetailsIndex == -1) {
             accOwnerName.setText("This account cannot be found.");
         }
-        if (getBankDetails().getAccNo().equals(getBankDetails().getName())) {
+        // If the user is trying to transfer to their own account, set the account owner name label to an error message
+        else if (getBankDetails().getAccNo().equals(getBankDetails().getName())) {
             accOwnerName.setText("You cannot transfer to your own account!");
         }
+        // Otherwise, set the account owner name label to the masked name of the account owner
         else {
             String name = RegisterMenu.bankDetailsList.get(findBankDetailsByAccNo(accNo)).getName();
             accOwnerName.setText(nameMask(name, 5));
@@ -315,12 +352,12 @@ public class MainBankMenu extends javax.swing.JFrame {
 
     public static void saveTransactionsFile() {
         try {
-            // Create a FileOutputStream to write to the BankDetails.dat file
+            // Create a FileOutputStream to write to the Transactions.dat file
             FileOutputStream file2 = new FileOutputStream("Transactions.dat");
             // Create an ObjectOutputStream using the FileOutputStream
             ObjectOutputStream outputFile2 = new ObjectOutputStream(file2);
 
-            // Loop through the bankDetailsList and write each object to the ObjectOutputStream
+            // Loop through the transactions and write each object to the ObjectOutputStream
             for (int i = 0; i < transactions.size(); i++) {
                 outputFile2.writeObject(transactions.get(i));
             }
@@ -334,12 +371,12 @@ public class MainBankMenu extends javax.swing.JFrame {
 
     public static void saveAccountsFile() {
         try {
-            // Create a FileOutputStream to write to the BankDetails.dat file
+            // Create a FileOutputStream to write to the Accounts.dat file
             FileOutputStream file2 = new FileOutputStream("Accounts.dat");
             // Create an ObjectOutputStream using the FileOutputStream
             ObjectOutputStream outputFile2 = new ObjectOutputStream(file2);
 
-            // Loop through the bankDetailsList and write each object to the ObjectOutputStream
+            // Loop through the accounts and write each object to the ObjectOutputStream
             for (int i = 0; i < accounts.size(); i++) {
                 outputFile2.writeObject(accounts.get(i));
             }
@@ -353,7 +390,7 @@ public class MainBankMenu extends javax.swing.JFrame {
 
     public static final void populateTransactions() {
         try {
-            // Create a FileInputStream to read from the BankDetails.dat file
+            // Create a FileInputStream to read from the Transactions.dat file
             FileInputStream file = new FileInputStream("Transactions.dat");
             // Create an ObjectInputStream using the FileInputStream
             ObjectInputStream inputFile = new ObjectInputStream(file);
@@ -363,7 +400,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             // Loop until the end of the file is reached
             while (!endOfFile) {
                 try {
-                    // Read an object from the ObjectInputStream and add it to the bankDetailsList
+                    // Read an object from the ObjectInputStream and add it to the transactions
                     transactions.add((Transactions) inputFile.readObject());
                 }
                 catch (EOFException e) {
@@ -384,7 +421,7 @@ public class MainBankMenu extends javax.swing.JFrame {
 
     public static final void populateAccounts() {
         try {
-            // Create a FileInputStream to read from the BankDetails.dat file
+            // Create a FileInputStream to read from the Accounts.dat file
             FileInputStream file = new FileInputStream("Accounts.dat");
             // Create an ObjectInputStream using the FileInputStream
             ObjectInputStream inputFile = new ObjectInputStream(file);
@@ -394,7 +431,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             // Loop until the end of the file is reached
             while (!endOfFile) {
                 try {
-                    // Read an object from the ObjectInputStream and add it to the bankDetailsList
+                    // Read an object from the ObjectInputStream and add it to the accounts
                     accounts.add((Accounts) inputFile.readObject());
                 }
                 catch (EOFException e) {
@@ -413,25 +450,39 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
     }
 
+    //this function used to only show certain pages in main menu.
     public final void accountDashboard() {
+        // Get the user's accounts
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
 
+        // Set the welcome label to the user's name
         welcomeLabel.setText(getBankDetails().getName());
 
+        // Initialize a variable to store the total balance
         double x = 0;
+
+        // Iterate through the user's accounts
         for (int i = 0; i < userAccounts.size(); i++) {
+            // Add the balance of the current account to the total balance
             x += userAccounts.get(i).getBalanceOfAccount();
         }
 
+        // Create a DecimalFormat object to format the total balance as a dollar amount
         DecimalFormat df = new DecimalFormat("#.00");
+
+        // Format the total balance as a string
         String s = df.format(x);
+
+        // If the total balance is zero, set the total balance label to "$ 0.00"
         if (x == 0.0) {
             totalBalance.setText("$ 0.00");
         }
+        // Otherwise, set the total balance label to the formatted total balance
         else {
             totalBalance.setText("$ " + s);
         }
-
+        
+        //rest of the code is only just showing and hiding account card images and setting the balances.
         switch (userAccounts.size()) {
             case 0:
                 dashboardAccounts.setVisible(false);
@@ -537,6 +588,12 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Finds bank details that match the given account number.
+     *
+     * @param str the account number to search
+     * @return index of bank details
+     */
     public static int findBankDetailsByAccNo(String str) {
         // loop through the list
         for (int i = 0; i < RegisterMenu.bankDetailsList.size(); i++) {
@@ -554,7 +611,8 @@ public class MainBankMenu extends javax.swing.JFrame {
     }
 
     /**
-     * Finds all accounts in the given list that match the given account number.
+     * Finds all transactions in the given list that match the given account
+     * number.
      *
      * @param transactions the list of transactions to search
      * @param AccNo        the account number to search for
@@ -564,15 +622,15 @@ public class MainBankMenu extends javax.swing.JFrame {
         // create an empty list to store the matching accounts
         ArrayList<Transactions> matchingAccounts = new ArrayList<>();
 
-        // iterate over the accounts in the list
+        // iterate over the transactions in the list
         for (Transactions transaction : transactions) {
-            // if the account number of the current account matches the search query, add it to the list of matching accounts
+            // if the account number of the current transactions matches the search query, add it to the list of matching transactions
             if (AccNo.equals(transaction.getUserAccNo())) {
                 matchingAccounts.add(transaction);
             }
         }
 
-        // return the list of matching accounts
+        // return the list of matching transactions
         return matchingAccounts;
     }
 
@@ -1145,6 +1203,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         accountsMenu.add(dashboardAccounts1);
         dashboardAccounts1.setBounds(220, 80, 560, 457);
 
+        createAccountButtonPanel.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
         createAccountButtonPanel.setForeground(new java.awt.Color(60, 63, 65));
         createAccountButtonPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         createAccountButtonPanel.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1164,14 +1223,14 @@ public class MainBankMenu extends javax.swing.JFrame {
             createAccountButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, createAccountButtonPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
                 .addContainerGap())
         );
         createAccountButtonPanelLayout.setVerticalGroup(
             createAccountButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(createAccountButtonPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
+                .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1192,6 +1251,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         transactionMenu.add(jLabel20);
         jLabel20.setBounds(6, 24, 907, 55);
 
+        transactionHistoryButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
         transactionHistoryButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         transactionHistoryButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1209,20 +1269,21 @@ public class MainBankMenu extends javax.swing.JFrame {
             transactionHistoryButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(transactionHistoryButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
+                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
                 .addContainerGap())
         );
         transactionHistoryButtonLayout.setVerticalGroup(
             transactionHistoryButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(transactionHistoryButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         transactionMenu.add(transactionHistoryButton);
         transactionHistoryButton.setBounds(120, 80, 150, 50);
 
+        depositButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
         depositButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         depositButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1240,20 +1301,21 @@ public class MainBankMenu extends javax.swing.JFrame {
             depositButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(depositButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel25, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
+                .addComponent(jLabel25, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
                 .addContainerGap())
         );
         depositButtonLayout.setVerticalGroup(
             depositButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(depositButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel25, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                .addComponent(jLabel25, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         transactionMenu.add(depositButton);
         depositButton.setBounds(390, 80, 150, 50);
 
+        withdrawButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
         withdrawButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         jLabel26.setFont(new java.awt.Font("Poppins", 1, 14)); // NOI18N
@@ -1271,14 +1333,14 @@ public class MainBankMenu extends javax.swing.JFrame {
             withdrawButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(withdrawButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel26, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
+                .addComponent(jLabel26, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
                 .addContainerGap())
         );
         withdrawButtonLayout.setVerticalGroup(
             withdrawButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(withdrawButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel26, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                .addComponent(jLabel26, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1413,6 +1475,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         jLabel9.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel9.setText("Amount");
 
+        depositAccButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
         depositAccButton.setForeground(new java.awt.Color(60, 63, 65));
         depositAccButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         depositAccButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1477,7 +1540,7 @@ public class MainBankMenu extends javax.swing.JFrame {
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(52, 52, 52)
                 .addComponent(depositAccButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(204, Short.MAX_VALUE))
+                .addContainerGap(200, Short.MAX_VALUE))
         );
 
         transactionMenu.add(depositPanel);
@@ -1493,6 +1556,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         jLabel16.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel16.setText("Amount");
 
+        withdrawAccButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
         withdrawAccButton.setForeground(new java.awt.Color(60, 63, 65));
         withdrawAccButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         withdrawAccButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1511,7 +1575,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             withdrawAccButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(withdrawAccButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel34, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+                .addComponent(jLabel34, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
                 .addContainerGap())
         );
         withdrawAccButtonLayout.setVerticalGroup(
@@ -1557,7 +1621,7 @@ public class MainBankMenu extends javax.swing.JFrame {
                 .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(52, 52, 52)
                 .addComponent(withdrawAccButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(204, Short.MAX_VALUE))
+                .addContainerGap(200, Short.MAX_VALUE))
         );
 
         transactionMenu.add(withdrawPanel);
@@ -1658,6 +1722,7 @@ public class MainBankMenu extends javax.swing.JFrame {
 
         jTextField2.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
 
+        confirmOtherAccButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
         confirmOtherAccButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 confirmOtherAccButtonMouseClicked(evt);
@@ -1732,7 +1797,7 @@ public class MainBankMenu extends javax.swing.JFrame {
                 .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(47, 47, 47)
                 .addComponent(confirmOtherAccButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(119, Short.MAX_VALUE))
+                .addContainerGap(115, Short.MAX_VALUE))
         );
 
         paymentsMenu.add(sendOtherAccPanel);
@@ -1742,6 +1807,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         sendAccPanel.setMaximumSize(new java.awt.Dimension(994, 531));
         sendAccPanel.setLayout(null);
 
+        confirmAccButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
         confirmAccButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         confirmAccButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1767,7 +1833,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             confirmAccButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(confirmAccButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
+                .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1838,16 +1904,23 @@ public class MainBankMenu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void logoutButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_logoutButtonMouseClicked
+        // Display confirm dialog asking user if they want to log out
         int result = JOptionPane.showConfirmDialog(null, "Sure? You want to log out?", "Log Out?",
                 JOptionPane.YES_NO_OPTION);
+
+        // If user clicks "Yes," close current window and open new login window
         if (result == 0) {
+            // Set lastPage to 1 and save userAccNo in savedUserAccNo
             lastPage = 1;
             LoginMenu.savedUserAccNo = userAccNo;
+
+            // Close current window and open new login window
             this.dispose();
             new LoginMenu().setVisible(true);
         }
     }//GEN-LAST:event_logoutButtonMouseClicked
 
+    //this function used to only show certain pages in main menu.
     private void accountsTabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accountsTabMouseClicked
         lastPage = 2;
         paymentsMenu.setVisible(false);
@@ -1857,6 +1930,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         transactionMenu.setVisible(false);
     }//GEN-LAST:event_accountsTabMouseClicked
 
+    //this function used to only show certain pages in main menu.
     private void dashboardTabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dashboardTabMouseClicked
         lastPage = 1;
         paymentsMenu.setVisible(false);
@@ -1866,22 +1940,31 @@ public class MainBankMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_dashboardTabMouseClicked
 
     private void createAccountButtonPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_createAccountButtonPanelMouseClicked
+        // Find all accounts belonging to the current user
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+
+        // If the user has 4 accounts already, display error message
         if (userAccounts.size() == 4) {
             JOptionPane.showMessageDialog(null, "You can't create more than 4 accounts!", "Warning!", JOptionPane.ERROR_MESSAGE);
         }
         else {
+            // Prompt user to enter a name for the new account
             String input = JOptionPane.showInputDialog("Please Enter Your Account Name.");
+
+            // If user does not enter a name, display error message
             if (input.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "You have to enter a name to your account!");
             }
             else {
+                // Create new account object and add it to the list of accounts
                 Accounts newAccount = new Accounts(userAccNo, accNumberCounter, 0, input);
-
                 accounts.add(newAccount);
 
-                JOptionPane.showMessageDialog(null, "Your new account saved.");
+                // Save the updated list of accounts to file and display success message
                 saveAccountsFile();
+                JOptionPane.showMessageDialog(null, "Your new account saved.");
+
+                // Increment the account number counter and open the main bank menu
                 accNumberCounter++;
                 dispose();
                 new MainBankMenu().setVisible(true);
@@ -1890,10 +1973,15 @@ public class MainBankMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_createAccountButtonPanelMouseClicked
 
     private void accNo5TrashMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accNo5TrashMouseClicked
+        // Find all accounts belonging to the current user
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
-        int x = JOptionPane.showConfirmDialog(null,
+
+        // Display confirm dialog asking if the user wants to delete the account
+        int result = JOptionPane.showConfirmDialog(null,
                 "You are about to delete the account. Are you sure?", "Warning!", JOptionPane.YES_NO_OPTION);
-        if (x == 0) {
+
+        // If the user clicks "Yes," delete the account and update the list of accounts
+        if (result == 0) {
             Accounts accountToRemove = userAccounts.get(0);
             accounts.remove(accountToRemove);
 
@@ -1906,11 +1994,16 @@ public class MainBankMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_accNo5TrashMouseClicked
 
     private void accNo6TrashMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accNo6TrashMouseClicked
+        // Find all accounts belonging to the current user
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
-        int x = JOptionPane.showConfirmDialog(null,
+
+        // Display confirm dialog asking if the user wants to delete the account
+        int result = JOptionPane.showConfirmDialog(null,
                 "You are about to delete the account. Are you sure?", "Warning!", JOptionPane.YES_NO_OPTION);
-        if (x == 0) {
-            Accounts accountToRemove = userAccounts.get(1);
+
+        // If the user clicks "Yes," delete the account and update the list of accounts
+        if (result == 0) {
+            Accounts accountToRemove = userAccounts.get(0);
             accounts.remove(accountToRemove);
 
             saveAccountsFile();
@@ -1922,11 +2015,16 @@ public class MainBankMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_accNo6TrashMouseClicked
 
     private void accNo7TrashMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accNo7TrashMouseClicked
+        // Find all accounts belonging to the current user
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
-        int x = JOptionPane.showConfirmDialog(null,
+
+        // Display confirm dialog asking if the user wants to delete the account
+        int result = JOptionPane.showConfirmDialog(null,
                 "You are about to delete the account. Are you sure?", "Warning!", JOptionPane.YES_NO_OPTION);
-        if (x == 0) {
-            Accounts accountToRemove = userAccounts.get(2);
+
+        // If the user clicks "Yes," delete the account and update the list of accounts
+        if (result == 0) {
+            Accounts accountToRemove = userAccounts.get(0);
             accounts.remove(accountToRemove);
 
             saveAccountsFile();
@@ -1938,11 +2036,16 @@ public class MainBankMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_accNo7TrashMouseClicked
 
     private void accNo8TrashMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accNo8TrashMouseClicked
+        // Find all accounts belonging to the current user
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
-        int x = JOptionPane.showConfirmDialog(null,
+
+        // Display confirm dialog asking if the user wants to delete the account
+        int result = JOptionPane.showConfirmDialog(null,
                 "You are about to delete the account. Are you sure?", "Warning!", JOptionPane.YES_NO_OPTION);
-        if (x == 0) {
-            Accounts accountToRemove = userAccounts.get(3);
+
+        // If the user clicks "Yes," delete the account and update the list of accounts
+        if (result == 0) {
+            Accounts accountToRemove = userAccounts.get(0);
             accounts.remove(accountToRemove);
 
             saveAccountsFile();
@@ -1953,6 +2056,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_accNo8TrashMouseClicked
 
+    //this function used to only show certain pages in main menu.
     private void paymentsTabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paymentsTabMouseClicked
         lastPage = 3;
         paymentsMenu.setVisible(true);
@@ -1962,44 +2066,60 @@ public class MainBankMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_paymentsTabMouseClicked
 
     private void switchButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_switchButtonMouseClicked
+        // Get the index of the selected item in each ComboBox
         int senderAccIndex = accFromComboBox.getSelectedIndex();
         int receverAccIndex = accToComboBox.getSelectedIndex();
+
+        // Swap the selected item in each ComboBox
         accFromComboBox.setSelectedIndex(receverAccIndex);
         accToComboBox.setSelectedIndex(senderAccIndex);
     }//GEN-LAST:event_switchButtonMouseClicked
 
     private void confirmAccButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_confirmAccButtonMouseClicked
+        // Find all accounts belonging to the current user
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+
+        // Get the index of the selected item in each ComboBox and the balance of the sender account
         int senderAccIndex = accFromComboBox.getSelectedIndex();
         int receiverAccIndex = accToComboBox.getSelectedIndex();
         double senderBalance = userAccounts.get(senderAccIndex).getBalanceOfAccount();
         double amountInput;
 
+        // If the sender and receiver accounts are the same, display error message
         if (senderAccIndex == receiverAccIndex) {
             JOptionPane.showMessageDialog(null, "You cannot transfer money to the same account!", "Error!", JOptionPane.WARNING_MESSAGE);
         }
+
+        // If the user does not have any accounts, display a prompt to create a new account
         if (senderAccIndex == -1 || receiverAccIndex == -1) {
-            int x = JOptionPane.showConfirmDialog(null, "You don't have any account.\nDo you want to open a new account?", "No Account!", JOptionPane.YES_NO_OPTION);
-            if (x == 0) {
+            int result = JOptionPane.showConfirmDialog(null, "You don't have any account.\nDo you want to open a new account?", "No Account!", JOptionPane.YES_NO_OPTION);
+            if (result == 0) {
                 accountsTabMouseClicked(evt);
                 createAccountButtonPanelMouseClicked(evt);
             }
         }
         else {
+            // Try to parse the input amount as a double
             try {
                 amountInput = Double.parseDouble(sendAccAmount.getText().trim());
             }
+            // If the text cannot be parsed as a double, display a warning message and return
             catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+
+            // If the sender does not have sufficient balance, display error message
             if (amountInput > senderBalance) {
                 JOptionPane.showMessageDialog(null, "Insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
             }
+
+            // If the input amount is negative, display error message
             if (amountInput < 0) {
                 JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
             }
             else {
+                // Transfer the money between the sender and receiver accounts
                 Accounts senderAccount = userAccounts.get(senderAccIndex);
                 Accounts receiverAccount = userAccounts.get(receiverAccIndex);
 
@@ -2009,76 +2129,98 @@ public class MainBankMenu extends javax.swing.JFrame {
                 accounts.set(accounts.indexOf(userAccounts.get(senderAccIndex)), senderAccount);
                 accounts.set(accounts.indexOf(userAccounts.get(receiverAccIndex)), receiverAccount);
 
+                // Create a new transaction and add it to the list of transactions
                 Transactions newTransaction = new Transactions(userAccNo, senderAccount.getAccountName(), receiverAccount.getAccountName(), systemDate, amountInput, senderAccount.getAccountName());
-
                 transactions.add(newTransaction);
 
+                // Save the updated list of transactions and accounts to file and display success message
                 saveTransactionsFile();
                 saveAccountsFile();
                 JOptionPane.showMessageDialog(null, "The transfer was successful!");
+
+                // Close the current window and open the main bank menu
                 dispose();
                 new MainBankMenu().setVisible(true);
             }
         }
     }//GEN-LAST:event_confirmAccButtonMouseClicked
 
+    //this function used to only show certain pages in main menu.
     private void sendPersonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sendPersonMouseClicked
         sendOtherAccPanel.setVisible(true);
         sendAccPanel.setVisible(false);
     }//GEN-LAST:event_sendPersonMouseClicked
 
+    //this function used to only show certain pages in main menu.
     private void sendAccountMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sendAccountMouseClicked
         sendOtherAccPanel.setVisible(false);
         sendAccPanel.setVisible(true);
     }//GEN-LAST:event_sendAccountMouseClicked
 
     private void confirmOtherAccButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_confirmOtherAccButtonMouseClicked
+        // Find all accounts belonging to the current user and the bank details of the recipient
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
-
         String receiventAccNo = accNoInput.getText().trim();
         int senderAccIndex = accFromComboBox1.getSelectedIndex();
         Accounts senderAcc = userAccounts.get(senderAccIndex);
         int bankDetailIndex = findBankDetailsByAccNo(receiventAccNo);
         double amountInput;
+        // If the recipient's account does not exist, display error message
         if (bankDetailIndex == -1) {
             JOptionPane.showMessageDialog(null, "The account you are trying to send does not exist!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
+
+        // If any of the input fields are empty, display error message
         if (jTextField2.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
+
+        // Try to parse the input amount as a double
         try {
             amountInput = Double.parseDouble(jTextField2.getText().trim());
         }
+        // If the text cannot be parsed as a double, display a warning message and return
         catch (Exception e) {
             JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        // If the sender does not have sufficient balance, display error message
         if (senderAcc.getBalanceOfAccount() < amountInput) {
             JOptionPane.showMessageDialog(null, "insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
+
+        // If the input amount is negative, display error message
         if (amountInput < 0) {
             JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
         else {
+            // Get the bank details of the recipient and their accounts
             BankDetails receiventBankDetails = RegisterMenu.bankDetailsList.get(findBankDetailsByAccNo(receiventAccNo));
             ArrayList<Accounts> receiventsAccounts = findAccountsByAccNo(accounts, receiventAccNo);
             Accounts senderAccount = userAccounts.get(senderAccIndex);
             Accounts receiverAccount = receiventsAccounts.get(0);
 
+            // Transfer the money between the sender and recipient accounts
             senderAccount.setBalanceOfAccount(senderAccount.getBalanceOfAccount() - amountInput);
             receiverAccount.setBalanceOfAccount(receiverAccount.getBalanceOfAccount() + amountInput);
 
             accounts.set(accounts.indexOf(senderAccount), senderAccount);
             accounts.set(accounts.indexOf(receiverAccount), receiverAccount);
 
-            Transactions newTransaction = new Transactions(userAccNo, getBankDetails().getName(), receiventBankDetails.getName(), systemDate, amountInput, senderAccount.getAccountName());
+            // Create new transactions for the sender and recipient and add them to the list of transactions
+            Transactions senderTransaction = new Transactions(userAccNo, getBankDetails().getName(), receiventBankDetails.getName(), systemDate, amountInput, senderAccount.getAccountName());
+            Transactions receiventTransaction = new Transactions(receiventAccNo, getBankDetails().getName(), receiventBankDetails.getName(), systemDate, amountInput, "");
 
-            transactions.add(newTransaction);
+            transactions.add(senderTransaction);
+            transactions.add(receiventTransaction);
 
+            // Save the updated list of transactions and accounts to file and display success message
             saveTransactionsFile();
-
             saveAccountsFile();
+
             JOptionPane.showMessageDialog(null, "The transfer was successful!");
+            // Close the current window and open the main bank menu
             dispose();
             new MainBankMenu().setVisible(true);
         }
@@ -2088,6 +2230,7 @@ public class MainBankMenu extends javax.swing.JFrame {
 
     }//GEN-LAST:event_accNoInputİnputMethodTextChanged
 
+    //this function used to only show certain pages in main menu.
     private void transactionsTabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_transactionsTabMouseClicked
         lastPage = 4;
         paymentsMenu.setVisible(false);
@@ -2097,12 +2240,14 @@ public class MainBankMenu extends javax.swing.JFrame {
         transactionMenu.setVisible(true);
     }//GEN-LAST:event_transactionsTabMouseClicked
 
+    //this function used to only show certain pages in main menu.
     private void depositButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_depositButtonMouseClicked
         transactionsPanel.setVisible(false);
         depositPanel.setVisible(true);
         withdrawPanel.setVisible(false);
     }//GEN-LAST:event_depositButtonMouseClicked
 
+    //this function used to only show certain pages in main menu.
     private void transactionHistoryButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_transactionHistoryButtonMouseClicked
         transactionsPanel.setVisible(true);
         depositPanel.setVisible(false);
@@ -2110,34 +2255,54 @@ public class MainBankMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_transactionHistoryButtonMouseClicked
 
     private void depositAccButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_depositAccButtonMouseClicked
+        // Find the accounts associated with the user's account number
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+
+        // Parse the double value from the text field
         double amountInput;
         int selectedIndex = depositAccComboBox.getSelectedIndex();
         try {
             amountInput = Double.parseDouble(jTextField1.getText().trim());
         }
+        // If the text cannot be parsed as a double, display a warning message and return
         catch (Exception e) {
             JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        // If the text field is empty, display a warning message and return
         if (jTextField1.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
+
+        // If the parsed double value is less than 0, display a warning message and return
         if (amountInput < 0) {
             JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
+        // Otherwise, proceed with the deposit
         else {
+            // Retrieve the selected account
             Accounts depositedAcc = userAccounts.get(selectedIndex);
+
+            // Increase the balance of the selected account by the amount input by the user
             depositedAcc.setBalanceOfAccount(depositedAcc.getBalanceOfAccount() + amountInput);
 
+            // Update the accounts list with the updated account
             accounts.set(accounts.indexOf(depositedAcc), depositedAcc);
 
+            // Create a new transaction object with details of the deposit
             Transactions newTransaction = new Transactions(userAccNo, getBankDetails().getName(), depositedAcc.getAccountName(), systemDate, amountInput, "Deposit!");
+            // Add the transaction to the transactions list
             transactions.add(newTransaction);
 
+            // Save the updated transactions and accounts lists to file
             saveTransactionsFile();
             saveAccountsFile();
+
+            // Display a success message
             JOptionPane.showMessageDialog(null, "The deposit was successful!");
+
+            // Close the current window and open the main bank menu window
             dispose();
             new MainBankMenu().setVisible(true);
         }
@@ -2145,41 +2310,60 @@ public class MainBankMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_depositAccButtonMouseClicked
 
     private void withdrawAccButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_withdrawAccButtonMouseClicked
+        // Find the accounts associated with the user's account number
         ArrayList<Accounts> userAccounts = findAccountsByAccNo(accounts, userAccNo);
+
+        // Parse the double value from the text field
         double amountInput;
         int selectedIndex = withdrawAccComboBox.getSelectedIndex();
         try {
             amountInput = Double.parseDouble(jTextField3.getText().trim());
         }
+        // If the text cannot be parsed as a double, display a warning message and return
         catch (Exception e) {
             JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        // If the text field is empty, display a warning message and return
         if (jTextField3.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
+
+        // If the parsed double value is less than 0, display a warning message and return
         if (amountInput < 0) {
             JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
+        // Otherwise, proceed with the withdrawal
         else {
+            // Retrieve the selected account
             Accounts withdrawAcc = userAccounts.get(selectedIndex);
+
+            // Decrease the balance of the selected account by the amount input by the user
             withdrawAcc.setBalanceOfAccount(withdrawAcc.getBalanceOfAccount() - amountInput);
 
+            // Update the accounts list with the updated account
             accounts.set(accounts.indexOf(withdrawAcc), withdrawAcc);
 
+            // Create a new transaction object with details of the withdrawal
             Transactions newTransaction = new Transactions(userAccNo, withdrawAcc.getAccountName(), getBankDetails().getName(), systemDate, amountInput, "Withdraw!");
+            // Add the transaction to the transactions list
             transactions.add(newTransaction);
 
+            // Save the updated transactions and accounts lists to file
             saveTransactionsFile();
             saveAccountsFile();
+
+            // Display a success message
             JOptionPane.showMessageDialog(null, "The Withdraw was successful!");
+
+            // Close the current window and open the main bank menu window
             dispose();
             new MainBankMenu().setVisible(true);
         }
-
-
     }//GEN-LAST:event_withdrawAccButtonMouseClicked
 
+    //this function used to only show certain pages in main menu.
     private void jLabel26MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel26MouseClicked
         transactionsPanel.setVisible(false);
         depositPanel.setVisible(false);

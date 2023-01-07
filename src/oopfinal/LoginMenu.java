@@ -216,7 +216,7 @@ public class LoginMenu extends javax.swing.JFrame {
                 // If a matching account number is found, store the index and retrieve the BankDetails object
                 if (Integer.parseInt(userDetails.getAccNo()) == Integer.parseInt(accNoInput)) {
                     userIndex = i;
-                    MainBankMenu.userBDAccNo = userDetails.getAccNo();
+                    MainBankMenu.userAccNo = userDetails.getAccNo();
 
                     System.out.println("userindex: " + userIndex + "\naccno: " + userDetails.getAccNo() + "\nname: " + userDetails.getName() + "\npass: " + userDetails.getPassword()
                             + "\nage: " + userDetails.getAge());
