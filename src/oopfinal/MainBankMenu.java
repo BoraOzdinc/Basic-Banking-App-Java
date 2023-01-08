@@ -474,7 +474,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         }
 
         // Create a DecimalFormat object to format the total balance as a dollar amount
-        DecimalFormat df = new DecimalFormat("#.00");
+        DecimalFormat df = new DecimalFormat("#0.00");
 
         // Format the total balance as a string
         String s = df.format(x);
@@ -2353,7 +2353,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         accounts.set(accounts.indexOf(depositedAcc), depositedAcc);
 
         // Create a new transaction object with details of the deposit
-        Transactions newTransaction = new Transactions(userAccNo, getBankDetails().getName(), depositedAcc.getAccountName(), systemDate, amountInput, "Deposit!");
+        Transactions newTransaction = new Transactions(userAccNo, getBankDetails().getName(), depositedAcc.getAccountName(), systemDate, amountInput, "Deposit");
         // Add the transaction to the transactions list
         transactions.add(newTransaction);
 
@@ -2416,7 +2416,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         accounts.set(accounts.indexOf(withdrawAcc), withdrawAcc);
 
         // Create a new transaction object with details of the withdrawal
-        Transactions newTransaction = new Transactions(userAccNo, withdrawAcc.getAccountName(), getBankDetails().getName(), systemDate, amountInput, "Withdraw!");
+        Transactions newTransaction = new Transactions(userAccNo, withdrawAcc.getAccountName(), getBankDetails().getName(), systemDate, amountInput, "Withdraw");
         // Add the transaction to the transactions list
         transactions.add(newTransaction);
 
