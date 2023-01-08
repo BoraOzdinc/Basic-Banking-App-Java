@@ -6,8 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Random;
 import javax.swing.JOptionPane;
 
 /**
@@ -21,10 +21,11 @@ public class RegisterMenu extends javax.swing.JFrame {
     public RegisterMenu() {
         // Initialize the GUI components
         initComponents();
-
+        
         // Populate the bankDetailsList with data from the BankDetails.dat file
         bankDetailsList.clear();
         populateBankDetailsList();
+        
     }
 
     public static void populateBankDetailsList() {
@@ -80,8 +81,9 @@ public class RegisterMenu extends javax.swing.JFrame {
     private static String rndAccNo() {
         // It will generate 6 digit random Number.
         // from 0 to 999999
-        Random rnd = new Random();
+        SecureRandom rnd = new SecureRandom();
         String number = String.format("%06d", rnd.nextInt(999999));
+        // If account number already exist re-run the function and generate a new one
         if(MainBankMenu.findBankDetailsByAccNo(number) != -1){
             rndAccNo();
         }
@@ -246,12 +248,13 @@ public class RegisterMenu extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Your age must contain only integers!");
             return;
         }
+        // check is the age is under 18
         if(Integer.parseInt(ageStr)<18){
             JOptionPane.showMessageDialog(null, "You must be 18 or older to register!");
             return;
         }
 
-        // If all the checks pass, create a BankDetails object with the entered data and add it to the bankDetailsList
+        // If all the checks pass, create a BankDetails object and Accounts object with the entered data and add them to associated ArrayList
         int age = Integer.parseInt(ageStr);
         String accNo = rndAccNo();
         BankDetails bankDetails = new BankDetails(accNo, password, name, age);
@@ -260,12 +263,13 @@ public class RegisterMenu extends javax.swing.JFrame {
         bankDetailsList.add(bankDetails);
         
 
-        // Save the bankDetailsList to the BankDetails.dat file
+        // Save the bankDetailsList and Accounts to file
         saveBankDetailsToFile();
         MainBankMenu.saveAccountsFile();
         
         // Show a success message with the account number
         JOptionPane.showMessageDialog(null, "Successfully Registered!\nHello " + name + " Your Account Number is " + accNo + "\nPlease remember your account number!");
+        // save the account number
         LoginMenu.savedUserAccNo = accNo;
         new LoginMenu().setVisible(true);
         dispose();

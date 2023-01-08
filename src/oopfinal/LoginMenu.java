@@ -62,11 +62,10 @@ public class LoginMenu extends javax.swing.JFrame {
 
     @Override
     public String toString() {
-        RegisterMenu r = new RegisterMenu();
 
         String results = "";
 
-        for (BankDetails d : r.bankDetailsList) {
+        for (BankDetails d : RegisterMenu.bankDetailsList) {
 
             results += d.toString();
         }
@@ -193,17 +192,17 @@ public class LoginMenu extends javax.swing.JFrame {
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
         // Create a new RegisterMenu object
         RegisterMenu r = new RegisterMenu();
-        
+
         // Check if the account number and password fields are empty
         if (this.accountNoLogin.getText().isEmpty() || this.passwordLogin.getText().isEmpty()) {
             // Display error message if either field is empty
             JOptionPane.showMessageDialog(null, "You Have To Fill All The Details!");
         }
-        if (!isSixDigit(this.accountNoLogin.getText())) {
+        else if (!isSixDigit(this.accountNoLogin.getText())) {
             // Display error message if the account number is not a 6-digit string
             JOptionPane.showMessageDialog(null, "Account No must be 6 digit long and Cannot contain any special characters!");
         }
-        if (!isFourDigit(this.passwordLogin.getText())) {
+        else if (!isFourDigit(this.passwordLogin.getText())) {
             // Display error message if the password is not a 4-digit string
             JOptionPane.showMessageDialog(null, "Password must be 4 digit long and cannot Contain any special characters!");
         }
@@ -213,13 +212,10 @@ public class LoginMenu extends javax.swing.JFrame {
             int userIndex = -1;
             for (int i = 0; i < RegisterMenu.bankDetailsList.size(); i++) {
                 BankDetails userDetails = RegisterMenu.bankDetailsList.get(i);
-                // If a matching account number is found, store the index and retrieve the BankDetails object
+                // If a matching account number is found, store the account number and retrieve the BankDetails object
                 if (Integer.parseInt(userDetails.getAccNo()) == Integer.parseInt(accNoInput)) {
                     userIndex = i;
                     MainBankMenu.userAccNo = userDetails.getAccNo();
-
-                    System.out.println("userindex: " + userIndex + "\naccno: " + userDetails.getAccNo() + "\nname: " + userDetails.getName() + "\npass: " + userDetails.getPassword()
-                            + "\nage: " + userDetails.getAge());
                     break;
                 }
             }
@@ -238,7 +234,7 @@ public class LoginMenu extends javax.swing.JFrame {
                 else {
                     // If the password is correct, display a success message and show the MainBankMenu form
                     JOptionPane.showMessageDialog(null, "Successfully logged in!\nHello " + userDetails.getName());
-                    
+
                     new MainBankMenu().setVisible(true);
                     dispose();
 
@@ -285,6 +281,7 @@ public class LoginMenu extends javax.swing.JFrame {
             public void run() {
                 new LoginMenu().setVisible(true);
             }
+
         });
     }
 
