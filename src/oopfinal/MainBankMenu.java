@@ -1875,7 +1875,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         jLabel17.setBounds(337, 39, 35, 22);
 
         jLabel18.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        jLabel18.setText("Amout");
+        jLabel18.setText("Amount");
         sendAccPanel.add(jLabel18);
         jLabel18.setBounds(340, 290, 60, 22);
 
