@@ -26,7 +26,7 @@ public class MainBankMenu extends javax.swing.JFrame {
 
     public static int lastPage = 1; //depending of the lastpage int when form re-opens it can continue...
 
-    //getting user's bank details
+    //getting user's bank details with user account number
     public static BankDetails getBankDetails() {
         return RegisterMenu.bankDetailsList.get(findBankDetailsByAccNo(userAccNo));
     }
@@ -739,7 +739,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         depositButton = new javax.swing.JPanel();
         jLabel25 = new javax.swing.JLabel();
         withdrawButton = new javax.swing.JPanel();
-        jLabel26 = new javax.swing.JLabel();
+        withdrawButtn = new javax.swing.JLabel();
         transactionsPanel = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         SourceTransactionList = new javax.swing.JList<>();
@@ -1337,12 +1337,12 @@ public class MainBankMenu extends javax.swing.JFrame {
         withdrawButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
         withdrawButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        jLabel26.setFont(new java.awt.Font("Poppins", 1, 14)); // NOI18N
-        jLabel26.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel26.setText("Withdraw");
-        jLabel26.addMouseListener(new java.awt.event.MouseAdapter() {
+        withdrawButtn.setFont(new java.awt.Font("Poppins", 1, 14)); // NOI18N
+        withdrawButtn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        withdrawButtn.setText("Withdraw");
+        withdrawButtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel26MouseClicked(evt);
+                withdrawButtnMouseClicked(evt);
             }
         });
 
@@ -1352,14 +1352,14 @@ public class MainBankMenu extends javax.swing.JFrame {
             withdrawButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(withdrawButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel26, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+                .addComponent(withdrawButtn, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
                 .addContainerGap())
         );
         withdrawButtonLayout.setVerticalGroup(
             withdrawButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(withdrawButtonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel26, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
+                .addComponent(withdrawButtn, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1875,7 +1875,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         jLabel17.setBounds(337, 39, 35, 22);
 
         jLabel18.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        jLabel18.setText("Amount");
+        jLabel18.setText("Amout");
         sendAccPanel.add(jLabel18);
         jLabel18.setBounds(340, 290, 60, 22);
 
@@ -2121,65 +2121,63 @@ public class MainBankMenu extends javax.swing.JFrame {
         // If the sender and receiver accounts are the same, display error message
         if (senderAccIndex == receiverAccIndex) {
             JOptionPane.showMessageDialog(null, "You cannot transfer money to the same account!", "Error!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
-        // If the user does not have any accounts, display a prompt to create a new account
-        else if (senderAccIndex == -1 || receiverAccIndex == -1) {
-            int result = JOptionPane.showConfirmDialog(null, "You don't have any account.\nDo you want to open a new account?", "No Account!", JOptionPane.YES_NO_OPTION);
-            if (result == 0) {
-                accountsTabMouseClicked(evt);
-                createAccountButtonPanelMouseClicked(evt);
-            }
+        // Try to parse the input amount as a double
+        try {
+            amountInput = Double.parseDouble(sendAccAmount.getText().trim());
         }
-        else {
-            // Try to parse the input amount as a double
-            try {
-                amountInput = Double.parseDouble(sendAccAmount.getText().trim());
-            }
-            // If the text cannot be parsed as a double, display a warning message and return
-            catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            // If the sender does not have sufficient balance, display error message
-            if (amountInput > senderBalance) {
-                JOptionPane.showMessageDialog(null, "Insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
-            }
-
-            // If the input amount is negative, display error message
-            else if (amountInput < 0) {
-                JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
-            }
-            // If the amount is more than 100.000, display a warning message and return
-            else if (amountInput > 100000) {
-                JOptionPane.showMessageDialog(null, "You cannot deposit more than $100,000 at a time.", "Warning!", JOptionPane.WARNING_MESSAGE);
-            }
-            else {
-                // Transfer the money between the sender and receiver accounts
-                Accounts senderAccount = userAccounts.get(senderAccIndex);
-                Accounts receiverAccount = userAccounts.get(receiverAccIndex);
-
-                senderAccount.setBalanceOfAccount(senderAccount.getBalanceOfAccount() - amountInput);
-                receiverAccount.setBalanceOfAccount(receiverAccount.getBalanceOfAccount() + amountInput);
-
-                accounts.set(accounts.indexOf(userAccounts.get(senderAccIndex)), senderAccount);
-                accounts.set(accounts.indexOf(userAccounts.get(receiverAccIndex)), receiverAccount);
-
-                // Create a new transaction and add it to the list of transactions
-                Transactions newTransaction = new Transactions(userAccNo, senderAccount.getAccountName(), receiverAccount.getAccountName(), systemDate, amountInput, senderAccount.getAccountName());
-                transactions.add(newTransaction);
-
-                // Save the updated list of transactions and accounts to file and display success message
-                saveTransactionsFile();
-                saveAccountsFile();
-                JOptionPane.showMessageDialog(null, "The transfer was successful!");
-
-                // Close the current window and open the main bank menu
-                dispose();
-                new MainBankMenu().setVisible(true);
-            }
+        // If the text cannot be parsed as a double, display a warning message and return
+        catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
+
+        // If the sender does not have sufficient balance, display error message
+        if (amountInput > senderBalance) {
+            JOptionPane.showMessageDialog(null, "Insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // If the input amount is negative, display error message
+        if (amountInput < 0) {
+            JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // If the amount is more than 100.000, display a warning message and return
+        if (amountInput > 100000) {
+            JOptionPane.showMessageDialog(null, "You cannot deposit more than $100,000 at a time.", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // If all tests pass get sender and receivent accounts
+        Accounts senderAccount = userAccounts.get(senderAccIndex);
+        Accounts receiverAccount = userAccounts.get(receiverAccIndex);
+
+        // transfer the money between the sender and receiver accounts
+        senderAccount.setBalanceOfAccount(senderAccount.getBalanceOfAccount() - amountInput);
+        receiverAccount.setBalanceOfAccount(receiverAccount.getBalanceOfAccount() + amountInput);
+
+        //edit the accounts
+        accounts.set(accounts.indexOf(userAccounts.get(senderAccIndex)), senderAccount);
+        accounts.set(accounts.indexOf(userAccounts.get(receiverAccIndex)), receiverAccount);
+
+        // Create a new transaction and add it to the list of transactions
+        Transactions newTransaction = new Transactions(userAccNo, senderAccount.getAccountName(), receiverAccount.getAccountName(), systemDate, amountInput, senderAccount.getAccountName());
+        transactions.add(newTransaction);
+
+        // Save the updated list of transactions and accounts to file and display success message
+        saveTransactionsFile();
+        saveAccountsFile();
+        JOptionPane.showMessageDialog(null, "The transfer was successful!");
+
+        // Close the current window and open the main bank menu to reload the details
+        dispose();
+        new MainBankMenu().setVisible(true);
+
+
     }//GEN-LAST:event_confirmAccButtonMouseClicked
 
     //this function used to only show certain pages in main menu.
@@ -2208,7 +2206,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             amountInput = Double.parseDouble(jTextField2.getText().trim());
         }
         // If the text cannot be parsed as a double, display a warning message and return
-        catch (Exception e) {
+        catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -2216,61 +2214,69 @@ public class MainBankMenu extends javax.swing.JFrame {
         // If the recipient's account does not exist, display error message
         if (bankDetailIndex == -1) {
             JOptionPane.showMessageDialog(null, "The account you are trying to send does not exist!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
         //if the receivent account number is the same as user account number, display error message
-        else if (receiventAccNo.equals(userAccNo)) {
+        if (receiventAccNo.equals(userAccNo)) {
             JOptionPane.showMessageDialog(null, "You can't send to your own account!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
         // If any of the input fields are empty, display error message
-        else if (jTextField2.getText().isEmpty()) {
+        if (jTextField2.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
         // If the sender does not have sufficient balance, display error message
-        else if (senderAcc.getBalanceOfAccount() < amountInput) {
+        if (senderAcc.getBalanceOfAccount() < amountInput) {
             JOptionPane.showMessageDialog(null, "insufficient balance!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
         // If the input amount is negative, display error message
-        else if (amountInput < 0) {
+        if (amountInput < 0) {
             JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
+
         // If the amount is more than 100.000, display a warning message and return
-        else if (amountInput > 100000) {
+        if (amountInput > 100000) {
             JOptionPane.showMessageDialog(null, "You cannot deposit more than $100,000 at a time.", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
-        else {
-            // Get the bank details of the recipient and their accounts
-            BankDetails receiventBankDetails = RegisterMenu.bankDetailsList.get(findBankDetailsByAccNo(receiventAccNo));
-            ArrayList<Accounts> receiventsAccounts = findAccountsByAccNo(accounts, receiventAccNo);
-            Accounts senderAccount = userAccounts.get(senderAccIndex);
-            Accounts receiverAccount = receiventsAccounts.get(0);
 
-            // Transfer the money between the sender and recipient accounts
-            senderAccount.setBalanceOfAccount(senderAccount.getBalanceOfAccount() - amountInput);
-            receiverAccount.setBalanceOfAccount(receiverAccount.getBalanceOfAccount() + amountInput);
+        // If all the checks pass
+        // Get the bank details of the recipient and their accounts
+        BankDetails receiventBankDetails = RegisterMenu.bankDetailsList.get(findBankDetailsByAccNo(receiventAccNo));
+        ArrayList<Accounts> receiventsAccounts = findAccountsByAccNo(accounts, receiventAccNo);
+        Accounts senderAccount = userAccounts.get(senderAccIndex);
+        Accounts receiverAccount = receiventsAccounts.get(0);
 
-            accounts.set(accounts.indexOf(senderAccount), senderAccount);
-            accounts.set(accounts.indexOf(receiverAccount), receiverAccount);
+        // Transfer the money between the sender and recipient accounts
+        senderAccount.setBalanceOfAccount(senderAccount.getBalanceOfAccount() - amountInput);
+        receiverAccount.setBalanceOfAccount(receiverAccount.getBalanceOfAccount() + amountInput);
 
-            // Create new transactions for the sender and recipient and add them to the list of transactions
-            Transactions senderTransaction = new Transactions(userAccNo, getBankDetails().getName(), receiventBankDetails.getName(), systemDate, amountInput, senderAccount.getAccountName());
-            Transactions receiventTransaction = new Transactions(receiventAccNo, getBankDetails().getName(), receiventBankDetails.getName(), systemDate, amountInput, "---");
+        accounts.set(accounts.indexOf(senderAccount), senderAccount);
+        accounts.set(accounts.indexOf(receiverAccount), receiverAccount);
 
-            transactions.add(senderTransaction);
-            transactions.add(receiventTransaction);
+        // Create new transactions for the sender and recipient and add them to the list of transactions
+        Transactions senderTransaction = new Transactions(userAccNo, getBankDetails().getName(), receiventBankDetails.getName(), systemDate, amountInput, senderAccount.getAccountName());
+        Transactions receiventTransaction = new Transactions(receiventAccNo, getBankDetails().getName(), receiventBankDetails.getName(), systemDate, amountInput, "---");
 
-            // Save the updated list of transactions and accounts to file and display success message
-            saveTransactionsFile();
-            saveAccountsFile();
+        transactions.add(senderTransaction);
+        transactions.add(receiventTransaction);
 
-            JOptionPane.showMessageDialog(null, "The transfer was successful!");
-            // Close the current window and open the main bank menu
-            dispose();
-            new MainBankMenu().setVisible(true);
-        }
+        // Save the updated list of transactions and accounts to file and display success message
+        saveTransactionsFile();
+        saveAccountsFile();
+
+        JOptionPane.showMessageDialog(null, "The transfer was successful!");
+        // Close the current window and open the main bank menu
+        dispose();
+        new MainBankMenu().setVisible(true);
+
     }//GEN-LAST:event_confirmOtherAccButtonMouseClicked
 
     private void accNoInputİnputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_accNoInputİnputMethodTextChanged
@@ -2308,11 +2314,12 @@ public class MainBankMenu extends javax.swing.JFrame {
         // Parse the double value from the text field
         double amountInput;
         int selectedIndex = depositAccComboBox.getSelectedIndex();
+
         try {
             amountInput = Double.parseDouble(jTextField1.getText().trim());
         }
         // If the text cannot be parsed as a double, display a warning message and return
-        catch (Exception e) {
+        catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -2320,43 +2327,47 @@ public class MainBankMenu extends javax.swing.JFrame {
         // If the text field is empty, display a warning message and return
         if (jTextField1.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
         // If the amount is less than 0, display a warning message and return
-        else if (amountInput < 0) {
+        if (amountInput < 0) {
             JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
+
         // If the amount is more than 100.000, display a warning message and return
-        else if (amountInput > 100000) {
+        if (amountInput > 100000) {
             JOptionPane.showMessageDialog(null, "You cannot deposit more than $100,000 at a time.", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
-        // Otherwise, proceed with the deposit
-        else {
-            // Retrieve the selected account
-            Accounts depositedAcc = userAccounts.get(selectedIndex);
 
-            // Increase the balance of the selected account by the amount input by the user
-            depositedAcc.setBalanceOfAccount(depositedAcc.getBalanceOfAccount() + amountInput);
+        // If all the checks pass, proceed with the deposit
+        // Retrieve the selected account
+        Accounts depositedAcc = userAccounts.get(selectedIndex);
 
-            // Update the accounts list with the updated account
-            accounts.set(accounts.indexOf(depositedAcc), depositedAcc);
+        // Increase the balance of the selected account by the amount input by the user
+        depositedAcc.setBalanceOfAccount(depositedAcc.getBalanceOfAccount() + amountInput);
 
-            // Create a new transaction object with details of the deposit
-            Transactions newTransaction = new Transactions(userAccNo, getBankDetails().getName(), depositedAcc.getAccountName(), systemDate, amountInput, "Deposit!");
-            // Add the transaction to the transactions list
-            transactions.add(newTransaction);
+        // Update the accounts list with the updated account
+        accounts.set(accounts.indexOf(depositedAcc), depositedAcc);
 
-            // Save the updated transactions and accounts lists to file
-            saveTransactionsFile();
-            saveAccountsFile();
+        // Create a new transaction object with details of the deposit
+        Transactions newTransaction = new Transactions(userAccNo, getBankDetails().getName(), depositedAcc.getAccountName(), systemDate, amountInput, "Deposit!");
+        // Add the transaction to the transactions list
+        transactions.add(newTransaction);
 
-            // Display a success message
-            JOptionPane.showMessageDialog(null, "The deposit was successful!");
+        // Save the updated transactions and accounts lists to file
+        saveTransactionsFile();
+        saveAccountsFile();
 
-            // Close the current window and open the main bank menu window
-            dispose();
-            new MainBankMenu().setVisible(true);
-        }
+        // Display a success message
+        JOptionPane.showMessageDialog(null, "The deposit was successful!");
+
+        // Close the current window and open the main bank menu window
+        dispose();
+        new MainBankMenu().setVisible(true);
+
 
     }//GEN-LAST:event_depositAccButtonMouseClicked
 
@@ -2371,7 +2382,7 @@ public class MainBankMenu extends javax.swing.JFrame {
             amountInput = Double.parseDouble(jTextField3.getText().trim());
         }
         // If the text cannot be parsed as a double, display a warning message and return
-        catch (Exception e) {
+        catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "your amount can only consist of numbers!", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -2379,51 +2390,55 @@ public class MainBankMenu extends javax.swing.JFrame {
         // If the text field is empty, display a warning message and return
         if (jTextField3.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please fill all the details!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
         // If the parsed double value is less than 0, display a warning message and return
-        else if (amountInput < 0) {
+        if (amountInput < 0) {
             JOptionPane.showMessageDialog(null, "amount cannot be less than zero!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
+
         // If the amount is more than 100.000, display a warning message and return
-        else if (amountInput > 100000) {
-            JOptionPane.showMessageDialog(null, "You cannot deposit more than $100,000 at a time.", "Warning!", JOptionPane.WARNING_MESSAGE);
+        if (amountInput > 100000) {
+            JOptionPane.showMessageDialog(null, "You cannot withdraw more than $100,000 at a time.", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
         }
-        // Otherwise, proceed with the withdrawal
-        else {
-            // Retrieve the selected account
-            Accounts withdrawAcc = userAccounts.get(selectedIndex);
 
-            // Decrease the balance of the selected account by the amount input by the user
-            withdrawAcc.setBalanceOfAccount(withdrawAcc.getBalanceOfAccount() - amountInput);
+        // If all the checks pass, proceed with the withdrawal
+        // Retrieve the selected account
+        Accounts withdrawAcc = userAccounts.get(selectedIndex);
 
-            // Update the accounts list with the updated account
-            accounts.set(accounts.indexOf(withdrawAcc), withdrawAcc);
+        // Decrease the balance of the selected account by the amount input by the user
+        withdrawAcc.setBalanceOfAccount(withdrawAcc.getBalanceOfAccount() - amountInput);
 
-            // Create a new transaction object with details of the withdrawal
-            Transactions newTransaction = new Transactions(userAccNo, withdrawAcc.getAccountName(), getBankDetails().getName(), systemDate, amountInput, "Withdraw!");
-            // Add the transaction to the transactions list
-            transactions.add(newTransaction);
+        // Update the accounts list with the updated account
+        accounts.set(accounts.indexOf(withdrawAcc), withdrawAcc);
 
-            // Save the updated transactions and accounts lists to file
-            saveTransactionsFile();
-            saveAccountsFile();
+        // Create a new transaction object with details of the withdrawal
+        Transactions newTransaction = new Transactions(userAccNo, withdrawAcc.getAccountName(), getBankDetails().getName(), systemDate, amountInput, "Withdraw!");
+        // Add the transaction to the transactions list
+        transactions.add(newTransaction);
 
-            // Display a success message
-            JOptionPane.showMessageDialog(null, "The Withdraw was successful!");
+        // Save the updated transactions and accounts lists to file
+        saveTransactionsFile();
+        saveAccountsFile();
 
-            // Close the current window and open the main bank menu window
-            dispose();
-            new MainBankMenu().setVisible(true);
-        }
+        // Display a success message
+        JOptionPane.showMessageDialog(null, "The Withdraw was successful!");
+
+        // Close the current window and open the main bank menu window
+        dispose();
+        new MainBankMenu().setVisible(true);
+
     }//GEN-LAST:event_withdrawAccButtonMouseClicked
 
     //this function used to only show certain pages in main menu.
-    private void jLabel26MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel26MouseClicked
+    private void withdrawButtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_withdrawButtnMouseClicked
         transactionsPanel.setVisible(false);
         depositPanel.setVisible(false);
         withdrawPanel.setVisible(true);
-    }//GEN-LAST:event_jLabel26MouseClicked
+    }//GEN-LAST:event_withdrawButtnMouseClicked
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -2534,7 +2549,6 @@ public class MainBankMenu extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
-    private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
@@ -2577,6 +2591,7 @@ public class MainBankMenu extends javax.swing.JFrame {
     private javax.swing.JLabel welcomeLabel1;
     private javax.swing.JPanel withdrawAccButton;
     private javax.swing.JComboBox<String> withdrawAccComboBox;
+    private javax.swing.JLabel withdrawButtn;
     private javax.swing.JPanel withdrawButton;
     private javax.swing.JPanel withdrawPanel;
     // End of variables declaration//GEN-END:variables

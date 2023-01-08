@@ -19,7 +19,7 @@ public class LoginMenu extends javax.swing.JFrame {
 
     }
 
-    boolean numberOrNot(String input) {
+    public static boolean numberOrNot(String input) {
         try {
             Integer.parseInt(input);
         }
@@ -30,7 +30,7 @@ public class LoginMenu extends javax.swing.JFrame {
         return true;
     }
 
-    public boolean isSixDigit(String accNo) {
+    public static boolean isSixDigit(String accNo) {
         if (numberOrNot(accNo)) {
             if (String.valueOf(accNo).length() == 6) {
                 return true;
@@ -45,7 +45,7 @@ public class LoginMenu extends javax.swing.JFrame {
         }
     }
 
-    public boolean isFourDigit(String accNo) {
+    public static boolean isFourDigit(String accNo) {
         if (numberOrNot(accNo)) {
             if (String.valueOf(accNo).length() == 4) {
                 return true;

@@ -21,11 +21,11 @@ public class RegisterMenu extends javax.swing.JFrame {
     public RegisterMenu() {
         // Initialize the GUI components
         initComponents();
-        
+
         // Populate the bankDetailsList with data from the BankDetails.dat file
         bankDetailsList.clear();
         populateBankDetailsList();
-        
+
     }
 
     public static void populateBankDetailsList() {
@@ -84,20 +84,20 @@ public class RegisterMenu extends javax.swing.JFrame {
         SecureRandom rnd = new SecureRandom();
         String number = String.format("%06d", rnd.nextInt(999999));
         // If account number already exist re-run the function and generate a new one
-        if(MainBankMenu.findBankDetailsByAccNo(number) != -1){
+        if (MainBankMenu.findBankDetailsByAccNo(number) != -1) {
             rndAccNo();
         }
         // this will convert any number sequence into 6 character.
         return number;
     }
 
-    public boolean containsOnlyLetters(String str) {
+    public static boolean containsOnlyLetters(String str) {
         // Use the matches() method of the String class to check if the string
         // matches the regular expression for alphabetical letters
         return str.matches("[a-zA-Z\\s']+");
     }
 
-    public boolean containsOnlyNumbers(String str) {
+    public static boolean containsOnlyNumbers(String str) {
         // Use the matches() method of the String class to check if the string
         // matches the regular expression for integer numbers
         return str.matches("\\d+");
@@ -217,9 +217,6 @@ public class RegisterMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
-        // Create a LoginMenu object to access the isFourDigit function
-        LoginMenu l = new LoginMenu();
-        
         // Get the name, password, and age from the text fields
         String name = this.registerName.getText().trim();
         String password = this.registerPassword.getText().trim();
@@ -232,7 +229,7 @@ public class RegisterMenu extends javax.swing.JFrame {
         }
 
         // Check if the password is 4 digits long and contains only digits
-        if (!l.isFourDigit(password)) {
+        if (!LoginMenu.isFourDigit(password)) {
             JOptionPane.showMessageDialog(null, "Password must be 4 digits long and cannot contain any special characters!");
             return;
         }
@@ -248,8 +245,13 @@ public class RegisterMenu extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Your age must contain only integers!");
             return;
         }
-        // check is the age is under 18
-        if(Integer.parseInt(ageStr)<18){
+        // check if the age is 3 digit or not
+        if (Integer.parseInt(ageStr) > 999) {
+            JOptionPane.showMessageDialog(null, "Your age must be 3 digit long");
+            return;
+        }
+        // check if the age is under 18
+        if (Integer.parseInt(ageStr) < 18) {
             JOptionPane.showMessageDialog(null, "You must be 18 or older to register!");
             return;
         }
@@ -261,12 +263,11 @@ public class RegisterMenu extends javax.swing.JFrame {
         Accounts mainAccount = new Accounts(accNo, 1, 0, "Main Account");
         MainBankMenu.accounts.add(mainAccount);
         bankDetailsList.add(bankDetails);
-        
 
         // Save the bankDetailsList and Accounts to file
         saveBankDetailsToFile();
         MainBankMenu.saveAccountsFile();
-        
+
         // Show a success message with the account number
         JOptionPane.showMessageDialog(null, "Successfully Registered!\nHello " + name + " Your Account Number is " + accNo + "\nPlease remember your account number!");
         // save the account number
@@ -308,6 +309,7 @@ public class RegisterMenu extends javax.swing.JFrame {
             public void run() {
                 new RegisterMenu().setVisible(true);
             }
+
         });
     }
 
