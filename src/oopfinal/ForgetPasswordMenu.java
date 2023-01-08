@@ -167,7 +167,7 @@ public class ForgetPasswordMenu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ForgetPassButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ForgetPassButtonMouseClicked
-        String userName = nameField.getText().trim();
+        String userName = nameField.getText().trim().toLowerCase();
         String userPass = PassField.getText().trim();
         
         // Check if the name and password fields are empty
@@ -187,7 +187,7 @@ public class ForgetPasswordMenu extends javax.swing.JFrame {
         for (int i = 0; i < RegisterMenu.bankDetailsList.size(); i++) {
             BankDetails userDetails = RegisterMenu.bankDetailsList.get(i);
             // If a matching name is found, retrieve the BankDetails object
-            if (userDetails.getName().equals(userName)) {
+            if (userDetails.getName().toLowerCase().equals(userName)) {
                 userIndex = i;
                 break;
             }
