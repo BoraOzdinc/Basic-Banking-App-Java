@@ -2404,6 +2404,12 @@ public class MainBankMenu extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "You cannot withdraw more than $100,000 at a time.", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        
+        // check if the user has enough balance to withdraw
+        if (userAccounts.get(selectedIndex).getBalanceOfAccount() < amountInput) {
+            JOptionPane.showMessageDialog(null, "insufficent balance", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         // If all the checks pass, proceed with the withdrawal
         // Retrieve the selected account
