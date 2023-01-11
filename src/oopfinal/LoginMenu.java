@@ -32,13 +32,7 @@ public class LoginMenu extends javax.swing.JFrame {
 
     public static boolean isSixDigit(String accNo) {
         if (numberOrNot(accNo)) {
-            if (String.valueOf(accNo).length() == 6) {
-                return true;
-            }
-            else {
-                return false;
-            }
-
+            return String.valueOf(accNo).length() == 6;
         }
         else {
             return false;
@@ -47,29 +41,12 @@ public class LoginMenu extends javax.swing.JFrame {
 
     public static boolean isFourDigit(String accNo) {
         if (numberOrNot(accNo)) {
-            if (String.valueOf(accNo).length() == 4) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return String.valueOf(accNo).length() == 4;
 
         }
         else {
             return false;
         }
-    }
-
-    @Override
-    public String toString() {
-
-        String results = "";
-
-        for (BankDetails d : RegisterMenu.bankDetailsList) {
-
-            results += d.toString();
-        }
-        return results;
     }
 
     /**
@@ -265,16 +242,16 @@ public class LoginMenu extends javax.swing.JFrame {
 
         // If both the account number and password are in the correct format, search for a matching account number in the bankDetailsList
         String accNoInput = this.accountNoLogin.getText().trim();
-        int userIndex = -1;
-        for (int i = 0; i < RegisterMenu.bankDetailsList.size(); i++) {
-            BankDetails userDetails = RegisterMenu.bankDetailsList.get(i);
+        int userIndex = MainBankMenu.findBankDetailsByAccNo(accNoInput);
+        
+            BankDetails userDetails = RegisterMenu.bankDetailsList.get(userIndex);
             // If a matching account number is found, store the account number and retrieve the BankDetails object
             if (Integer.parseInt(userDetails.getAccNo()) == Integer.parseInt(accNoInput)) {
-                userIndex = i;
+                
                 MainBankMenu.userAccNo = userDetails.getAccNo();
-                break;
+                
             }
-        }
+        
 
         // If the account number is not found, display an error message
         if (userIndex == -1) {
@@ -282,7 +259,7 @@ public class LoginMenu extends javax.swing.JFrame {
         }
         else {
             // If the account number is found, retrieve the BankDetails object and check if the password matches
-            BankDetails userDetails = RegisterMenu.bankDetailsList.get(userIndex);
+            
             if (!userDetails.getPassword().equals(this.passwordLogin.getText().trim())) {
                 // Display error message if the password is incorrect
                 JOptionPane.showMessageDialog(null, "Your Account Number or Password is invalid!");

@@ -1872,7 +1872,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         jLabel17.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel17.setText("From");
         sendAccPanel.add(jLabel17);
-        jLabel17.setBounds(337, 39, 35, 22);
+        jLabel17.setBounds(337, 39, 36, 22);
 
         jLabel18.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel18.setText("Amout");
@@ -1896,7 +1896,7 @@ public class MainBankMenu extends javax.swing.JFrame {
         jLabel19.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jLabel19.setText("To");
         sendAccPanel.add(jLabel19);
-        jLabel19.setBounds(340, 180, 17, 22);
+        jLabel19.setBounds(340, 180, 16, 22);
 
         paymentsMenu.add(sendAccPanel);
         sendAccPanel.setBounds(0, 164, 994, 531);
